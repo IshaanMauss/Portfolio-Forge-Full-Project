@@ -178,3 +178,30 @@
     font-size: 2rem;
   }
 }
+@media print {
+    /* Hides non-essential elements like the navbar and footer from the PDF */
+    body .navbar,
+    body .footer {
+        display: none;
+    }
+
+    /* Resets the main container for better printing */
+    .resume-container {
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+        border: none;
+    }
+
+    /* Ensures project cards don't get split across pages */
+    .project-card-resume {
+        page-break-inside: avoid;
+        box-shadow: none;
+        border: 1px solid #eee;
+    }
+
+    /* Switches the project layout to a simple block flow for the PDF */
+    .projects-grid-resume {
+        display: block;
+    }
+}
