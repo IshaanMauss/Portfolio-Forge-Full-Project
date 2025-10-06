@@ -1,0 +1,8 @@
+# functions/requirements.txt
+
+firebase-functions
+firebase-admin
+Flask==3.0.0
+requests==2.31.0
+Flask-Cors==4.0.0
+python-dotenv
