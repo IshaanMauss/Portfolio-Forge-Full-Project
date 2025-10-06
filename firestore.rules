@@ -1,0 +1,12 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // This rule targets your "portfolios" collection
+    match /portfolios/{userId} {
+      // Allow a user to read, write, update, and delete ONLY their OWN portfolio.
+      // It checks if the logged-in user's ID (request.auth.uid) matches the
+      // document's ID (the userId).
+      allow read, write: if request.auth.uid == userId;
+    }
+  }
+}

@@ -30,9 +30,14 @@ def handle_enhance_bio(req: https_fn.Request, headers: dict):
     try:
         data = req.get_json()
         bio_text = data.get('bio')
-        if not bio_text:
-            return https_fn.Response('{"error":"Bio text is required"}', status=400, headers=headers, mimetype="application/json")
-        prompt = f"Rewrite and enhance the following professional bio for a tech portfolio. Make it concise, professional, and impactful, keeping it to 4-5 lines. Do not add a 'Title:' or any other prefix. Bio: \"{bio_text}\""
+        
+        # --- SECURITY FIX ADDED ---
+        # Checks if bio_text is missing, empty, or too long
+        if not bio_text or len(bio_text) > 1500:
+            return https_fn.Response('{"error":"Bio text is required and must be less than 1500 characters"}', status=400, headers=headers, mimetype="application/json")
+        # --- END OF SECURITY FIX ---
+
+        prompt = f"Rewrite and enhance the following professional bio for a tech portfolio. Make it sound professional and engaging. Do not add a 'Title:' or any other prefix. Bio: \\\"{bio_text}\\\"\""
         enhanced_text = generate_ai_content(prompt)
         response_data = json.dumps({'enhancedText': enhanced_text})
         return https_fn.Response(response_data, status=200, headers=headers, mimetype="application/json")
@@ -44,8 +49,13 @@ def handle_enhance_project(req: https_fn.Request, headers: dict):
     try:
         data = req.get_json()
         project_info = data.get('project_info')
-        if not project_info:
-            return https_fn.Response('{"error":"Project info is required"}', status=400, headers=headers, mimetype="application/json")
+
+        # --- SECURITY FIX ADDED ---
+        # Checks if project_info is missing, empty, or too long
+        if not project_info or len(project_info) > 1500:
+            return https_fn.Response('{"error":"Project info is required and must be less than 1500 characters"}', status=400, headers=headers, mimetype="application/json")
+        # --- END OF SECURITY FIX ---
+
         prompt = f"Generate a professional project description for a tech portfolio based on these keywords: '{project_info}'. The description should be 3-4 sentences long. Do not add a 'Title:' or any other prefix."
         enhanced_text = generate_ai_content(prompt)
         response_data = json.dumps({'enhancedText': enhanced_text})

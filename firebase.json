@@ -20,5 +20,8 @@
   "functions": {
     "source": "portfolio-forge-backend/functions",
     "runtime": "python312"
+  },
+  "firestore": {
+    "rules": "firestore.rules"
   }
 }
