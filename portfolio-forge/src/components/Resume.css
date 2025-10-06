@@ -1,0 +1,180 @@
+/* A professional, clean, and responsive resume style */
+.resume-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  padding: 1rem;
+  background-color: #0a192f;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  border-bottom: 1px solid #112240;
+}
+
+.resume-actions button {
+  background-color: #64ffda;
+  color: #0a192f;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: opacity 0.2s ease;
+}
+
+.resume-actions button:hover {
+  opacity: 0.8;
+}
+
+.theme-toggle-wrapper {
+  color: #ccd6f6;
+}
+
+.resume-container {
+  max-width: 8.5in;
+  min-height: 11in;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background-color: #fff;
+  color: #333;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+  font-family: 'Lato', sans-serif;
+  line-height: 1.6;
+}
+
+.resume-header {
+  text-align: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-pic-resume {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1rem;
+}
+
+.resume-header h1 {
+  color: #112240;
+  margin: 0;
+  font-family: 'Roboto Slab', serif;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.resume-header .subtitle {
+  font-size: 1.1rem;
+  color: #555;
+  margin-top: 0.25rem;
+  font-weight: normal;
+}
+
+.contact-info {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.contact-info a {
+  color: #0056b3;
+  text-decoration: none;
+  font-weight: bold;
+}
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+.resume-main {
+  display: flex;
+  gap: 2rem;
+}
+
+.main-col-resume { flex: 2.5; }
+.sidebar-col-resume { flex: 1; }
+
+.resume-container h2 {
+  font-family: 'Roboto Slab', serif;
+  font-size: 1.2rem;
+  color: #112240;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 0.25rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.resume-container h2:first-child {
+  margin-top: 0;
+}
+
+.project-item-resume, .education-item-resume, .certification-item-resume {
+  margin-bottom: 1rem;
+}
+
+.project-item-resume h3, .education-item-resume h3, .certification-item-resume h3 {
+  margin-bottom: 0.1rem;
+  color: #112240;
+  font-size: 1.1rem;
+}
+.project-item-resume p, .education-item-resume p, .certification-item-resume p {
+  font-size: 0.95rem;
+  color: #555;
+}
+
+.skills-list-resume {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.skills-list-resume li {
+  background-color: #e9ecef;
+  color: #333;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+/* --- THEME STYLES (Subtle application) --- */
+.resume-container.theme-applied {
+  color: var(--text-color, #333);
+}
+.resume-container.theme-applied h1,
+.resume-container.theme-applied h2,
+.resume-container.theme-applied h3 {
+  color: var(--header-color, #112240);
+}
+.resume-container.theme-applied h2 {
+  border-bottom-color: var(--accent-color);
+}
+.resume-container.theme-applied .subtitle {
+  color: var(--accent-color);
+  font-weight: bold;
+}
+.resume-container.theme-applied .contact-info a {
+  color: var(--accent-color);
+}
+.resume-container.theme-applied .skills-list-resume li {
+  background-color: var(--accent-color);
+  color: var(--bg-color); /* Use theme background for text for contrast */
+}
+
+/* --- RESPONSIVE DESIGN FOR MOBILE & TABLET --- */
+@media (max-width: 768px) {
+  .resume-container {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  .resume-main {
+    flex-direction: column;
+  }
+  .resume-header h1 {
+    font-size: 2rem;
+  }
+}

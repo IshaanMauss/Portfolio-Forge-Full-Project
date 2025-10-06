@@ -1,0 +1,15 @@
+/* src/index.css */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif;
+  background-color: #0a192f; /* Dark Navy from our theme */
+  color: #ccd6f6; /* Lightest Slate */
+}
