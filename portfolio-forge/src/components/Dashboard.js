@@ -1,23 +1,26 @@
 import React from 'react';
 import ControlPanel from './ControlPanel';
 import PreviewPanel from './PreviewPanel';
-import Footer from './Footer'; // <-- 1. Import the Footer
+import Footer from './Footer';
 
-function Dashboard({ portfolioData, setPortfolioData }) {
+// The Dashboard is now simpler. It just passes the right data and the new updater function.
+function Dashboard({ portfolioData, updatePortfolio }) {
+
   if (!portfolioData) {
     return <div className="loading-screen">Loading Your Portfolio...</div>;
   }
 
   return (
-    <> {/* Use a fragment to wrap multiple components */}
+    <>
       <div className="panels-container">
-        <ControlPanel 
-          portfolioData={portfolioData} 
-          setPortfolioData={setPortfolioData} 
+        <ControlPanel
+          portfolioData={portfolioData}
+          // Pass the centralized updater function directly to the ControlPanel
+          updatePortfolio={updatePortfolio}
         />
         <PreviewPanel portfolioData={portfolioData} />
       </div>
-      <Footer /> {/* <-- 2. Add the Footer component here */}
+      <Footer />
     </>
   );
 }

@@ -12,6 +12,19 @@ import PublicPortfolio from './components/PublicPortfolio';
 import Resume from './components/Resume';
 import './App.css';
 
+const updateNestedState = (obj, path, value) => {
+  const keys = path.split('.');
+  const newObj = { ...obj };
+  let current = newObj;
+  for (let i = 0; i < keys.length - 1; i++) {
+    const key = keys[i];
+    current[key] = current[key] ? { ...current[key] } : {};
+    current = current[key];
+  }
+  current[keys[keys.length - 1]] = value;
+  return newObj;
+};
+
 const deepMerge = (target, source) => {
   const output = { ...target };
   if (target && typeof target === 'object' && source && typeof source === 'object') {
@@ -39,32 +52,23 @@ function App() {
     },
     portfolios: {
       default: {
-        userName: currentUser.displayName || 'Your Name',
-        userSubtitle: 'Your Professional Subtitle',
-        profilePicUrl: currentUser.photoURL || '',
-        bio: 'A brief description about yourself.',
-        location: { value: '', showOnPage: true },
-        address: { value: '', showOnPage: false },
-        links: { linkedin: '', github: '', email: currentUser.email || '' },
-        hardSkills: { showOnPage: true, items: ['HTML', 'CSS', 'JavaScript'] },
-        softSkills: { showOnPage: true, items: ['Communication', 'Teamwork'] },
-        interests: { showOnPage: true, items: ['Open Source', 'UI/UX Design'] },
-        certifications: { showOnPage: true, items: [] },
-        education: {
-          college: { name: '', course: '', gradYear: '', showOnPage: true },
-          class12: { school: '', percentage: '', board: '', passingYear: '', showOnPage: false },
-          class10: { school: '', percentage: '', board: '', passingYear: '', showOnPage: false },
-        },
-        projects: { showOnPage: true, items: [] },
-        blogPosts: { showOnPage: false, items: [] },
-        customSections: { title: 'Custom Section', showOnPage: false, items: [] },
-        theme: {
-          font: 'Poppins',
-          backgroundColor: '#0a192f',
-          textColor: '#ccd6f6',
-          accentColor: '#64ffda',
-          layout: 'standard',
-        },
+        userName: currentUser.displayName || 'Your Name', 
+        userSubtitle: 'Your Professional Subtitle', 
+        profilePicUrl: currentUser.photoURL || '', 
+        profilePicDataUrl: '', // <-- THE FIX: Add new field here
+        bio: 'A brief description about yourself.', 
+        location: { value: '', showOnPage: true }, 
+        address: { value: '', showOnPage: false }, 
+        links: { linkedin: '', github: '', email: currentUser.email || '' }, 
+        hardSkills: { showOnPage: true, items: ['HTML', 'CSS', 'JavaScript'] }, 
+        softSkills: { showOnPage: true, items: ['Communication', 'Teamwork'] }, 
+        interests: { showOnPage: true, items: ['Open Source', 'UI/UX Design'] }, 
+        certifications: { showOnPage: true, items: [] }, 
+        education: { college: { name: '', course: '', gradYear: '', showOnPage: true }, class12: { school: '', percentage: '', board: '', passingYear: '', showOnPage: false }, class10: { school: '', percentage: '', board: '', passingYear: '', showOnPage: false }, }, 
+        projects: { showOnPage: true, items: [] }, 
+        blogPosts: { showOnPage: false, items: [] }, 
+        customSections: { title: 'Custom Section', showOnPage: false, items: [] }, 
+        theme: { font: 'Poppins', backgroundColor: '#0a192f', textColor: '#ccd6f6', accentColor: '#64ffda', layout: 'standard', },
       }
     }
   });
@@ -94,11 +98,43 @@ function App() {
     return () => unsubscribe();
   }, []);
 
+  const handlePortfolioUpdate = (path, value) => {
+    setPortfolioData(prev => {
+      if (!prev || !prev.portfolios || !prev.portfolios[activePortfolio]) {
+        console.error("Cannot update portfolio, data structure is invalid.", {prev, activePortfolio});
+        return prev;
+      }
+      const newPortfolios = { ...prev.portfolios };
+      const activePortfolioObject = newPortfolios[activePortfolio];
+      const updatedActivePortfolio = updateNestedState(activePortfolioObject, path, value);
+      newPortfolios[activePortfolio] = updatedActivePortfolio;
+      return { ...prev, portfolios: newPortfolios };
+    });
+  };
+
+  const handleDeleteVersion = (versionIdToDelete) => {
+    if (versionIdToDelete === 'default') {
+        toast.error("You cannot delete your main portfolio.");
+        return;
+    }
+    const versionName = portfolioData.meta.versions.find(v => v.id === versionIdToDelete)?.name || 'this version';
+    setPortfolioData(prev => {
+        const newVersions = prev.meta.versions.filter(v => v.id !== versionIdToDelete);
+        const newPortfolios = { ...prev.portfolios };
+        delete newPortfolios[versionIdToDelete];
+
+        return { ...prev, meta: { ...prev.meta, versions: newVersions }, portfolios: newPortfolios };
+    });
+    setActivePortfolio('default');
+    toast.success(`Deleted "${versionName}"`);
+  };
+
   const handleSave = async () => {
     if (!user) return toast.error("You must be logged in to save.");
     const docRef = doc(db, "portfolios", user.uid);
     try {
-      await setDoc(docRef, portfolioData, { merge: true });
+      const dataToSave = { ...portfolioData, meta: { ...portfolioData.meta, activeVersion: activePortfolio, } };
+      await setDoc(docRef, dataToSave, { merge: true });
       toast.success(`Portfolio saved successfully!`);
     } catch (error) {
       console.error("Error saving data:", error);
@@ -106,21 +142,12 @@ function App() {
     }
   };
 
-  if (loading) {
-    return <div className="loading-screen">Loading...</div>;
-  }
+  if (loading) return <div className="loading-screen">Loading...</div>;
 
   return (
     <>
       <ToastContainer position="bottom-right" autoClose={4000} theme="dark" />
-      <Navbar
-        user={user}
-        handleSave={handleSave}
-        portfolioData={portfolioData}
-        setPortfolioData={setPortfolioData}
-        activePortfolio={activePortfolio}
-        setActivePortfolio={setActivePortfolio}
-      />
+      <Navbar user={user} handleSave={handleSave} portfolioData={portfolioData} setPortfolioData={setPortfolioData} activePortfolio={activePortfolio} setActivePortfolio={setActivePortfolio} handleDeleteVersion={handleDeleteVersion} />
       <Routes>
         <Route
           path="/"
@@ -128,24 +155,13 @@ function App() {
             user ?
             <Dashboard
               portfolioData={portfolioData?.portfolios[activePortfolio]}
-              setPortfolioData={(updater) => {
-                setPortfolioData(prev => {
-                  const updatedActivePortfolio = updater(prev.portfolios[activePortfolio]);
-                  return {
-                    ...prev,
-                    portfolios: {
-                      ...prev.portfolios,
-                      [activePortfolio]: updatedActivePortfolio
-                    }
-                  };
-                });
-              }}
+              updatePortfolio={handlePortfolioUpdate}
             /> :
             <Login />
           }
         />
-        <Route path="/p/:userId" element={<PublicPortfolio />} />
-        <Route path="/resume/:userId" element={<Resume />} />
+        <Route path="/p/:userId/:versionId?" element={<PublicPortfolio />} />
+        <Route path="/resume/:userId/:versionId?" element={<Resume />} />
       </Routes>
     </>
   );

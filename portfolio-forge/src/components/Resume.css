@@ -56,6 +56,7 @@
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 1rem;
+   flex-shrink: 0;
 }
 
 .resume-header h1 {
@@ -204,4 +205,59 @@
     .projects-grid-resume {
         display: block;
     }
+}
+/* --- HYBRID APPROACH: PRINT STYLES FOR PDF --- */
+
+@media print {
+  /* Page ko standard A4 size ke liye set karo */
+  @page {
+    size: A4;
+    margin: 20mm; /* Standard margin for documents */
+  }
+
+  /* Screen par dikhne wale buttons ko hide karo */
+  .resume-actions {
+    display: none;
+  }
+
+  /* Page ki extra shadow aur margin hata do */
+  .resume-container {
+    margin: 0;
+    box-shadow: none;
+    max-width: 100%;
+    border: none;
+  }
+
+  /* Yeh sabse zaroori hai: sections ko page ke beech mein se todne se roko */
+  section,
+  .project-item-resume,
+  .education-item-resume {
+    page-break-inside: avoid;
+  }
+
+  /* PDF mein headings thodi choti aur saaf dikhao */
+  h1, h2, h3 {
+    color: #000; /* Force black color for printing */
+  }
+
+  h2 {
+    padding-bottom: 5px;
+    border-bottom: 2px solid #ccc;
+    margin-top: 1.5rem;
+  }
+
+  /* Links ka color print ke liye theek karo */
+  a {
+    color: #0000EE; /* Standard blue for links in print */
+    text-decoration: none;
+  }
+
+  /* Skills ke background color ko hata do,
+     sirf border rakho taaki print mein saaf lage */
+  .skills-list-resume li {
+    background-color: transparent !important; /* Force transparent background */
+    color: #000 !important; /* Force black text */
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+  }
 }

@@ -9,25 +9,25 @@ import './Resume.css';
 import { toast } from 'react-toastify';
 
 function Resume() {
-  const { userId } = useParams();
+  const { userId, versionId } = useParams();
   const [portfolioData, setPortfolioData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [applyTheme, setApplyTheme] = useState(false);
 
   useEffect(() => {
     const fetchPortfolio = async () => {
-      if (!userId) return;
+      if (!userId) { setLoading(false); return; }
       const docRef = doc(db, "portfolios", userId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
         const fullData = docSnap.data();
-        const activeVersionId = fullData.meta?.activeVersion || 'default';
-        setPortfolioData(fullData.portfolios[activeVersionId]);
+        const versionToShow = versionId || fullData.meta?.activeVersion || 'default';
+        setPortfolioData(fullData.portfolios[versionToShow]);
       }
       setLoading(false);
     };
     fetchPortfolio();
-  }, [userId]);
+  }, [userId, versionId]);
 
   const formatUrl = (url) => {
     if (!url) return '';
@@ -41,65 +41,84 @@ function Resume() {
     return parseInt(year) > currentYear;
   };
 
+  // ... (existing imports and other code above exportToPdf function) ...
+
   const exportToPdf = () => {
     const resumeElement = document.getElementById('resume-content');
-    const { userName, links } = portfolioData;
+    const { userName = 'User' } = portfolioData;
 
-    toast.info("Generating PDF, please wait...");
+    if (!resumeElement) {
+      toast.error("Could not find resume content to download.");
+      return;
+    }
+    toast.info("Generating a high-quality PDF...");
+
+    const scrollY = window.scrollY;
+    window.scrollTo(0, 0);
 
     html2canvas(resumeElement, {
-      scale: 2,
-      useCORS: true,
-      allowTaint: true,
-      logging: true,
+        scale: 2.5, // **CHANGED: A balanced scale for great quality and smaller size**
+        useCORS: true,
+        logging: true,
+        dpi: 192, // **CHANGED: Reduced DPI, still great for screens**
+        letterRendering: true,
     }).then(canvas => {
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      const canvasAspectRatio = canvas.width / canvas.height;
-      const pdfAspectRatio = pdfWidth / pdfHeight;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+        const ratio = canvasHeight / canvasWidth;
+        
+        let imgWidth = pdfWidth;
+        let imgHeight = pdfWidth * ratio;
+        let x_offset = 0;
+        let y_offset = 0;
 
-      let renderWidth = pdfWidth;
-      let renderHeight = renderWidth / canvasAspectRatio;
+        if (imgHeight > pdfHeight) {
+            imgHeight = pdfHeight;
+            imgWidth = imgHeight / ratio;
+            x_offset = (pdfWidth - imgWidth) / 2;
+        }
 
-      if (renderHeight > pdfHeight) {
-          renderHeight = pdfHeight;
-          renderWidth = renderHeight * canvasAspectRatio;
-      }
-      
-      const imgData = canvas.toDataURL('image/png');
-      pdf.addImage(imgData, 'PNG', 0, 0, renderWidth, renderHeight);
+        // **THE KEY CHANGE: Convert canvas to JPEG format with medium quality**
+        const imageData = canvas.toDataURL('image/jpeg', 0.9); // 0.9 is 90% quality
 
-      const addLink = (elementId, url) => {
-          const element = document.getElementById(elementId);
-          if (element) {
-              const { x, y, width, height } = element.getBoundingClientRect();
-              const resumeRect = resumeElement.getBoundingClientRect();
-              const scaleX = renderWidth / resumeRect.width;
-              const scaleY = renderHeight / resumeRect.height;
-              
-              const x_mm = (x - resumeRect.left) * scaleX;
-              const y_mm = (y - resumeRect.top) * scaleY;
-              const width_mm = width * scaleX;
-              const height_mm = height * scaleY;
+        pdf.addImage(imageData, 'JPEG', x_offset, y_offset, imgWidth, imgHeight, null, 'MEDIUM');
 
-              pdf.link(x_mm, y_mm, width_mm, height_mm, { url });
-          }
-      };
-      
-      if (links?.email) addLink('email-link', `mailto:${links.email}`);
-      if (links?.linkedin) addLink('linkedin-link', formatUrl(links.linkedin));
-      if (links?.github) addLink('github-link', formatUrl(links.github));
+        // --- ADD CLICKABLE LINKS (This logic remains the same) ---
+        const scaleFactor = imgWidth / resumeElement.offsetWidth;
+        const resumeRect = resumeElement.getBoundingClientRect();
 
-      pdf.save(`${userName}_Resume.pdf`);
-      toast.success("PDF Downloaded!");
+        ['email-link', 'linkedin-link', 'github-link'].forEach(id => {
+            const linkEl = document.getElementById(id);
+            if (linkEl) {
+                const rect = linkEl.getBoundingClientRect();
+                const relativeX = rect.left - resumeRect.left;
+                const relativeY = rect.top - resumeRect.top;
+
+                const x = x_offset + (relativeX * scaleFactor);
+                const y = y_offset + (relativeY * scaleFactor);
+                const w = rect.width * scaleFactor;
+                const h = rect.height * scaleFactor;
+                
+                pdf.link(x, y, w, h, { url: linkEl.href });
+            }
+        });
+
+        pdf.save(`${userName.replace(/\s+/g, '_')}_Resume.pdf`);
+        toast.success("PDF Downloaded!");
+
     }).catch(err => {
-      console.error("PDF Generation Error:", err);
-      toast.error("Could not generate PDF. Check console for details.");
+        console.error("PDF Generation Error:", err);
+        toast.error("Could not generate PDF. Check console for details.");
+    }).finally(() => {
+        window.scrollTo(0, scrollY);
     });
   };
 
+// ... (rest of the component code below exportToPdf function) ...
   if (loading) return <div className="loading-screen">Loading Resume...</div>;
   if (!portfolioData) return <div className="loading-screen">Could not find resume data.</div>;
 
@@ -107,7 +126,9 @@ function Resume() {
     userName, userSubtitle, location, links, bio,
     hardSkills = { items: [] }, softSkills = { items: [] },
     interests = { items: [] }, certifications = { items: [] },
-    projects = { items: [] }, education, profilePicUrl, theme = {}
+    projects = { items: [] }, education, 
+    profilePicUrl, profilePicDataUrl, // Get the new Data URL field
+    theme = {}
   } = portfolioData;
 
   const dynamicStyles = {
@@ -116,6 +137,9 @@ function Resume() {
     '--text-color': theme.textColor || '#333',
     '--header-color': theme.textColor || '#112240',
   };
+
+  // Prioritize the Data URL for the image source to bypass CORS completely
+  const imageToDisplay = profilePicDataUrl || profilePicUrl;
 
   return (
     <>
@@ -127,7 +151,7 @@ function Resume() {
       </div>
       <div id="resume-content" className={`resume-container ${applyTheme ? 'theme-applied' : ''}`} style={applyTheme ? dynamicStyles : {}}>
         <header className="resume-header">
-          {profilePicUrl && <img id="resume-profile-pic" src={profilePicUrl} alt="Profile" crossOrigin="anonymous" className="profile-pic-resume" />}
+          {imageToDisplay && <img id="resume-profile-pic" src={imageToDisplay} alt="Profile" crossOrigin="anonymous" className="profile-pic-resume" />}
           <h1>{userName}</h1>
           <p className="subtitle">{userSubtitle}</p>
           <div className="contact-info">
