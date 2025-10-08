@@ -4,7 +4,7 @@ function PreviewPanel({ portfolioData }) {
   if (!portfolioData) {
     return <main className="preview-panel"><div>Loading Preview...</div></main>;
   }
-  
+
   const {
     theme = {},
     userName = 'Your Name',
@@ -43,7 +43,17 @@ function PreviewPanel({ portfolioData }) {
       .header { text-align: center; margin-bottom: 3rem; background: none; padding: 0;}
       .profile-pic { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid ${theme.accentColor || '#64ffda'}; margin-bottom: 1rem; }
       .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-      .card { background-color: rgba(255,255,255, 0.05); padding: 1.5rem; border-radius: 8px; }
+      .card { 
+        background-color: rgba(255,255,255, 0.05); 
+        padding: 1.5rem; 
+        border-radius: 8px;
+        overflow-wrap: break-word; /* This will wrap long text */
+        word-wrap: break-word;     /* Fallback for older browsers */
+      }
+      .card h4 {
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+      }
       .skills-list { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0; list-style: none; justify-content: center; }
       .skills-list li { background-color: ${theme.accentColor || '#64ffda'}; color: ${theme.backgroundColor || '#0a192f'}; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 500;}
       .expected-year { font-style: italic; opacity: 0.8; font-size: 0.9em; }
@@ -79,15 +89,22 @@ function PreviewPanel({ portfolioData }) {
             </div>
         </section>` : ''}
 
-        ${blogPosts?.showOnPage && blogPosts?.items?.length > 0 ? `<section class="section"><h3>Blog Posts</h3><div class="grid">${blogPosts.items.map(p => `<div class="card"><h4>${p.title}</h4><p>${p.content}</p></div>`).join('')}</div></section>` : ''}
-        ${customSections?.showOnPage && customSections?.items?.length > 0 ? `<section class="section"><h3>${customSections.title || 'Custom Section'}</h3><div class="grid">${customSections.items.map(item => `<div class="card"><h4>${item.title}</h4><p>${item.content}</p></div>`).join('')}</div></section>` : ''}
+${blogPosts?.showOnPage && blogPosts?.items?.length > 0 ? `<section class="section"><h3>Blog Posts</h3><div class="grid">${blogPosts.items.map(p => `<div class="card"><h4>${p.title}</h4><p>${p.content}</p></div>`).join('')}</div></section>` : ''}
+${customSections?.showOnPage && customSections?.items?.length > 0 ? `<section class="section"><h3>${customSections.title || 'Custom Section'}</h3><div class="grid">${customSections.items.map(item => `<div class="card"><h4>${item.title}</h4><p>${item.content}</p></div>`).join('')}</div></section>` : ''}
+      </body>
       </body>
     </html>
   `;
 
   return (
     <main className="preview-panel">
-      <iframe id="portfolio-preview" srcDoc={previewContent} title="Portfolio Preview"></iframe>
+      {/* --- THE FIX IS HERE: The key will change when data changes, forcing a re-render --- */}
+      <iframe
+        id="portfolio-preview"
+        key={JSON.stringify(portfolioData)}
+        srcDoc={previewContent}
+        title="Portfolio Preview"
+      ></iframe>
     </main>
   );
 }

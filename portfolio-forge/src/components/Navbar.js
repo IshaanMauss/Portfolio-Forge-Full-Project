@@ -51,26 +51,24 @@ const DeleteConfirmToast = ({ closeToast, onConfirm, portfolioName }) => {
 
 // --- NAVBAR COMPONENT ---
 
-function Navbar({ user, handleSave, portfolioData, setPortfolioData, activePortfolio, setActivePortfolio, handleDeleteVersion }) {
+function Navbar({ user, handleSave, portfolioData, activePortfolio, setActivePortfolio, handleDeleteVersion, handleCreateVersion }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleSignOut = () => { auth.signOut(); navigate('/'); };
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMobileMenu = () => setIsMenuOpen(false);
+
+  const handleSignOut = () => { auth.signOut(); closeMobileMenu(); navigate('/'); };
   const handleGoBack = () => { window.history.length > 2 && location.key !== "default" ? navigate(-1) : navigate('/'); };
   const handleVersionChange = (e) => { setActivePortfolio(e.target.value); };
 
+  // --- DEEP FIX 2: STATE LOGIC YAHAN SE HATAKAR APP.JS KE FUNCTION KO CALL KIYA GAYA ---
   const triggerCreateNewVersion = () => {
+    closeMobileMenu();
     const handleConfirm = (newVersionName) => {
-      const newVersionId = `v_${Date.now()}`;
-      const basePortfolio = JSON.parse(JSON.stringify(portfolioData.portfolios[activePortfolio] || {}));
-
-      setPortfolioData(prev => {
-        const newVersions = [...(prev.meta?.versions || []), { id: newVersionId, name: newVersionName }];
-        const newPortfolios = { ...prev.portfolios, [newVersionId]: basePortfolio };
-        return { ...prev, meta: { ...prev.meta, versions: newVersions }, portfolios: newPortfolios };
-      });
-      setActivePortfolio(newVersionId);
-      toast.success(`Created new version: "${newVersionName}"`);
+      // Ab hum state ko seedhe manipulate karne ke bajaye App.js ke function ko call karte hain
+      handleCreateVersion(newVersionName);
     };
 
     toast(<NewVersionToast onConfirm={handleConfirm} />, {
@@ -83,6 +81,7 @@ function Navbar({ user, handleSave, portfolioData, setPortfolioData, activePortf
   };
 
   const triggerDeleteVersion = (versionId) => {
+    closeMobileMenu();
     const portfolioNameToDelete = portfolioData.meta.versions.find(v => v.id === versionId)?.name;
     toast(<DeleteConfirmToast onConfirm={() => handleDeleteVersion(versionId)} portfolioName={portfolioNameToDelete} />, {
         className: 'modal-toast-container',
@@ -100,9 +99,27 @@ function Navbar({ user, handleSave, portfolioData, setPortfolioData, activePortf
     <nav className="navbar">
       <div className="nav-container">
         {!isDashboard && <button onClick={handleGoBack} className="nav-back-button">&larr;</button>}
-        <Link to="/" className="nav-logo"> Portfolio Forge </Link>
+        <Link to="/" className="nav-logo" onClick={closeMobileMenu}> Portfolio Forge </Link>
+        
         {user && (
-          <ul className="nav-menu">
+          <div className="menu-icon" onClick={toggleMenu}>
+            {isMenuOpen ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 12H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M3 6H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <path d="M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </div>
+        )}
+
+        {user && (
+          <ul className={isMenuOpen ? 'nav-menu active' : 'nav-menu'}>
             {isDashboard && (
               <>
                 <li className="nav-item version-selector">
@@ -117,13 +134,12 @@ function Navbar({ user, handleSave, portfolioData, setPortfolioData, activePortf
                     </button>
                   )}
                 </li>
-                <li className="nav-item"><a href={`/p/${user.uid}/${activePortfolio}`} target="_blank" rel="noopener noreferrer" className="nav-link">Public View</a></li>
-                <li className="nav-item"><a href={`/resume/${user.uid}/${activePortfolio}`} target="_blank" rel="noopener noreferrer" className="nav-link">Web Resume</a></li>
-                <li className="nav-item"><button onClick={handleSave} className="nav-link-button save">Save</button></li>
+                <li className="nav-item"><a href={`/p/${user.uid}/${activePortfolio}`} target="_blank" rel="noopener noreferrer" className="nav-link" onClick={closeMobileMenu}>Public View</a></li>
+                <li className="nav-item"><a href={`/resume/${user.uid}/${activePortfolio}`} target="_blank" rel="noopener noreferrer" className="nav-link" onClick={closeMobileMenu}>Web Resume</a></li>
+                <li className="nav-item"><button onClick={() => { handleSave(); closeMobileMenu(); }} className="nav-link-button save">Save</button></li>
               </>
             )}
             <li className="nav-item">
-              {/* Changed className here for consistent styling */}
               <button onClick={handleSignOut} className="nav-link-button">Sign Out</button>
             </li>
           </ul>

@@ -43,11 +43,29 @@ function PublicPortfolio() {
 
   if (loading || !portfolioData) return <div className="loading-screen">Loading...</div>;
 
-  const { theme = {}, userName, userSubtitle, profilePicUrl, bio, location, links, projects = { items: [] }, hardSkills = { items: [] }, softSkills = { items: [] }, interests = { items: [] }, education = {}, certifications = { items: [] }, blogPosts = { showOnPage: false, items: [] }, customSections = { showOnPage: false, items: [] } } = portfolioData;
+  // --- YAHAN PAR FIX KIYA GAYA HAI ---
+  // customSections ke default object mein 'title' add kiya gaya hai.
+  const { 
+    theme = {}, 
+    userName, 
+    userSubtitle, 
+    profilePicUrl, 
+    bio, 
+    location, 
+    links, 
+    projects = { items: [] }, 
+    hardSkills = { items: [] }, 
+    softSkills = { items: [] }, 
+    interests = { items: [] }, 
+    education = {}, 
+    certifications = { items: [] }, 
+    blogPosts = { showOnPage: false, items: [] }, 
+    customSections = { title: 'Custom Section', showOnPage: false, items: [] } 
+  } = portfolioData;
+  
   const layoutClass = theme.layout === 'compact' ? 'layout-compact' : 'layout-standard';
   const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentPageUrl)}`;
 
-  // --- THE FIX: Check if there's at least one link to show the contact section ---
   const showContactSection = links?.email || links?.linkedin || links?.github;
 
   return (
@@ -76,12 +94,12 @@ function PublicPortfolio() {
           <section className="section-public about-section"><h3 style={{ borderBottomColor: theme.accentColor }}>About Me</h3><p>{bio}</p></section>
           {projects?.showOnPage && <section className="section-public projects-section"><h3 style={{ borderBottomColor: theme.accentColor }}>Projects</h3><div className="grid-container">{projects.items.map((p, i) => (<div key={i} className="item-card-public"><h4>{p.title}</h4><p>{p.description}</p><div className="project-links-public">{p.liveUrl && <a href={formatUrl(p.liveUrl)} target="_blank" rel="noopener noreferrer">Live Demo</a>}{p.githubUrl && <a href={formatUrl(p.githubUrl)} target="_blank" rel="noopener noreferrer">GitHub</a>}</div></div>))}</div></section>}
           {certifications?.showOnPage && certifications.items.length > 0 && <section className="section-public certifications-section"><h3 style={{ borderBottomColor: theme.accentColor }}>Certifications</h3><div className="grid-container">{certifications.items.map((c, i) => (<div key={i} className="item-card-public"><h4>{c.name}</h4><p>{c.issuer}</p></div>))}</div></section>}
-          {blogPosts?.showOnPage && <section className="section-public blog-section-public"><h3 style={{ borderBottomColor: theme.accentColor }}>Blog Posts</h3><div className="grid-container">{blogPosts.items.map((p, i) => (<div key={i} className="item-card-public"><h4>{p.title}</h4><p>{p.content}</p></div>))}</div></section>}
-          {customSections?.showOnPage && customSections.items.length > 0 && <section className="section-public custom-section"><h3 style={{ borderBottomColor: theme.accentColor }}>{customSections.title || 'Custom Section'}</h3><div className="grid-container">{customSections.items.map((item, i) => (<div key={i} className="item-card-public"><h4>{item.title}</h4><p>{item.content}</p></div>))}</div></section>}
+       
+         {blogPosts?.showOnPage && blogPosts.items.length > 0 && <section className="section-public blog-section-public"><h3 style={{ borderBottomColor: theme.accentColor }}>Blog Posts</h3><div className="grid-container">{blogPosts.items.map((p, i) => (<div key={i} className="item-card-public"><h4>{p.title}</h4><p>{p.content}</p></div>))}</div></section>}
+         {customSections?.showOnPage && customSections.items.length > 0 && <section className="section-public custom-section"><h3 style={{ borderBottomColor: theme.accentColor }}>{customSections.title || 'Custom Section'}</h3><div className="grid-container">{customSections.items.map((item, i) => (<div key={i} className="item-card-public"><h4>{item.title}</h4><p>{item.content}</p></div>))}</div></section>}
         </main>
         <aside className="sidebar-column-public">
-          {/* --- THE FIX IS HERE --- */}
-          {showContactSection && (
+          {showContactSection  && (
             <section className="section-public card-public contact-section">
               <h4>Contact</h4>
               {links?.email && <a href={`mailto:${links.email}`}>{links.email}</a>}

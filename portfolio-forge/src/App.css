@@ -16,73 +16,370 @@
   flex-direction: column;
 }
 
-.controls-section { margin-bottom: 2rem; }
-.controls-section summary { cursor: pointer; padding: 0.5rem 0; border-bottom: 1px solid #233554; margin-bottom: 1rem; font-weight: 600; outline: none; }
-.controls-section summary:hover { color: #64ffda; }
-.controls-section h3 { color: #ccd6f6; }
-.controls-section label { display: block; margin-top: 1rem; margin-bottom: 0.25rem; color: #8892b0; font-size: 0.9rem; }
-.controls-section input, .controls-section textarea, .controls-section select { width: 100%; padding: 0.8rem; margin-bottom: 1rem; border-radius: 4px; border: 1px solid #233554; background-color: #0a192f; color: #ccd6f6; font-size: 1rem; font-family: 'Poppins', sans-serif; }
-.tag-input-container { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0.5rem; border: 1px solid #233554; border-radius: 4px; }
-.tag-input-container input { flex-grow: 1; border: none; background: none; padding: 0; margin: 0; outline: none; }
-.tag { display: flex; align-items: center; gap: 0.5rem; background-color: #64ffda; color: #0a192f; padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 500; font-size: 0.9rem; }
-.tag button { background: none; border: none; color: #0a192f; cursor: pointer; font-weight: bold; }
-.profile-pic-area { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 1rem; }
-.profile-pic-preview { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid #64ffda; }
-.item-list { margin-top: 1rem; }
-.list-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; background-color: #0a192f; border-radius: 4px; margin-bottom: 0.5rem; }
-.remove-btn { background-color: #e63946; color: white; border: none; cursor: pointer; border-radius: 4px; padding: 0.2rem 0.5rem;}
+.controls-section {
+  margin-bottom: 2rem;
+}
+.controls-section summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #233554;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  outline: none;
+}
+.controls-section summary:hover {
+  color: #64ffda;
+}
+.controls-section h3 {
+  color: #ccd6f6;
+}
+.controls-section label {
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.25rem;
+  color: #8892b0;
+  font-size: 0.9rem;
+}
+.controls-section input,
+.controls-section textarea,
+.controls-section select {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  border: 1px solid #233554;
+  background-color: #0a192f;
+  color: #ccd6f6;
+  font-size: 1rem;
+  font-family: 'Poppins', sans-serif;
+}
+.tag-input-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border: 1px solid #233554;
+  border-radius: 4px;
+}
+.tag-input-container input {
+  flex-grow: 1;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  outline: none;
+}
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #64ffda;
+  color: #0a192f;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+.tag button {
+  background: none;
+  border: none;
+  color: #0a192f;
+  cursor: pointer;
+  font-weight: bold;
+}
+.profile-pic-area {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+.profile-pic-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #64ffda;
+}
 
+.ai-prompt {
+  display: block;
+  font-size: 0.8rem;
+  color: #8892b0;
+  margin-top: -0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* === NEW 3D BUTTON STYLING === */
+.add-btn,
+.cancel-btn,
+.edit-btn,
+.remove-btn {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.2);
+  transform: translateY(0);
+}
+
+.add-btn:hover,
+.cancel-btn:hover,
+.edit-btn:hover,
+.remove-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 0 rgba(0, 0, 0, 0.2);
+}
+
+.add-btn:active,
+.cancel-btn:active,
+.edit-btn:active,
+.remove-btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.2);
+}
+
+.add-btn {
+  background-color: #64ffda; /* Accent Color */
+  color: #0a192f;
+  flex-grow: 1; /* Takes remaining space */
+}
+
+.cancel-btn {
+  background-color: #495670; /* Slate */
+  color: #ccd6f6;
+}
+
+.edit-btn {
+  background-color: #3a7bd5; /* A nice blue */
+  color: white;
+  padding: 5px 12px;
+  font-size: 0.9rem;
+}
+
+.remove-btn {
+  background-color: #e63946; /* Red */
+  color: white;
+  padding: 5px 12px;
+  font-size: 0.9rem;
+}
+
+.profile-pic-area input[type="file"] {
+  display: none;
+}
+.profile-pic-area::before {
+  content: 'Choose File';
+  display: inline-block;
+  background: #495670;
+  color: #ccd6f6;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 0 0 rgba(0, 0, 0, 0.2);
+}
+.profile-pic-area:hover::before {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 0 rgba(0, 0, 0, 0.2);
+}
+.profile-pic-area:active::before {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.2);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+.item-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.item-list {
+  margin-top: 1rem;
+}
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: #0a192f;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  border-left: 3px solid #64ffda;
+}
 
 /* --- Preview Panel (Right Side) --- */
-.preview-panel { flex-grow: 1; background-color: #0a192f; padding: 1rem; }
-#portfolio-preview { width: 100%; height: 100%; border: none; background-color: white; border-radius: 8px; }
+.preview-panel {
+  flex-grow: 1;
+  background-color: #0a192f;
+  padding: 1rem;
+}
+#portfolio-preview {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background-color: white;
+  border-radius: 8px;
+}
 
 /* --- Login & Loading Styles --- */
-.login-container, .loading-screen { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center; }
+.login-container,
+.loading-screen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+}
 
 /* --- Dashboard & Panels --- */
-.panels-container { display: flex; flex-grow: 1; overflow: hidden; height: calc(100vh - 80px); }
+.panels-container {
+  display: flex;
+  flex-grow: 1;
+  overflow: hidden;
+  height: calc(100vh - 80px);
+}
 
-/* --- Public Portfolio Base Styles --- */
-.public-portfolio-container { max-width: 1000px; margin: 0 auto; padding: 4rem 2rem; }
-.hero-public { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem; margin-bottom: 3rem; text-align: left; }
-.hero-main-content { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-.profile-pic-public { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid; }
-.location-public { margin-top: 0.5rem; opacity: 0.8; }
-.section-public { margin-bottom: 2rem; }
-.section-public h3 { font-size: 1.5rem; padding-bottom: 0.5rem; margin-bottom: 1rem; border-bottom: 2px solid; }
-.item-card-public { margin-bottom: 1rem; }
-.item-card-public h4 { margin-bottom: 0.5rem; }
-.project-links-public { margin-top: 1rem; display: flex; gap: 1rem; }
-.skills-list-public { display: flex; flex-wrap: wrap; gap: 0.5rem; list-style: none; padding: 0; }
-.skills-list-public li { padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 500; }
-.grid-container { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-
-/* --- STANDARD TWO-COLUMN LAYOUT --- */
-.layout-standard .main-content-public { display: flex; gap: 3rem; }
-.layout-standard .main-column-public { flex: 2.5; }
-.layout-standard .sidebar-column-public { flex: 1; display: flex; flex-direction: column; gap: 1.5rem; }
-.layout-standard .card-public { background-color: rgba(0,0,0,0.1); padding: 1.5rem; border-radius: 8px; }
-.layout-standard .card-public h4 { margin-bottom: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.2); padding-bottom: 0.5rem; }
-.layout-standard .card-public a { display: block; margin-bottom: 0.5rem; }
-.layout-standard .item-card-public h4::before { content: '•'; color: #64ffda; font-size: 1.5rem; margin-right: 0.75rem; vertical-align: middle; }
-.layout-standard .education-grid { grid-template-columns: 1fr; gap: 1rem; }
-
-/* --- LinkedIn Button --- */
-.linkedin-share-btn { display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.7rem 1.3rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem; transition: all 0.2s ease-in-out; background-color: #0077B5; color: white; border: 1px solid transparent; cursor: pointer; white-space: nowrap; }
-.linkedin-share-btn:hover { background-color: #005582; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
-
-
-/* ================================================================= */
-/* === FINAL PREVIEW-PANEL STYLE SINGLE-COLUMN LAYOUT (COMPACT)    === */
-/* ================================================================= */
-
-/* Set the container width for the single-column view */
+.public-portfolio-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 4rem 2rem;
+}
+.hero-public {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  text-align: left;
+}
+.hero-main-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+.profile-pic-public {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid;
+}
+.location-public {
+  margin-top: 0.5rem;
+  opacity: 0.8;
+}
+.section-public {
+  margin-bottom: 2rem;
+}
+.section-public h3 {
+  font-size: 1.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid;
+}
+.item-card-public {
+  margin-bottom: 1rem;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+.item-card-public h4 {
+  margin-bottom: 0.5rem;
+}
+.project-links-public {
+  margin-top: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+.skills-list-public {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+}
+.skills-list-public li {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+.layout-standard .main-content-public {
+  display: flex;
+  gap: 3rem;
+}
+.layout-standard .main-column-public {
+  flex: 2.5;
+}
+.layout-standard .sidebar-column-public {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.layout-standard .card-public {
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+.layout-standard .card-public h4 {
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 0.5rem;
+}
+.layout-standard .card-public a {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+.layout-standard .item-card-public h4::before {
+  content: '•';
+  color: #64ffda;
+  font-size: 1.5rem;
+  margin-right: 0.75rem;
+  vertical-align: middle;
+}
+.layout-standard .education-grid {
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+.linkedin-share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 1.3rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+  background-color: #0077b5;
+  color: white;
+  border: 1px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.linkedin-share-btn:hover {
+  background-color: #005582;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
 .layout-compact .public-portfolio-container {
   max-width: 850px;
 }
-
-/* Style the header to match the preview panel */
 .layout-compact .hero-public {
   display: block;
   text-align: center;
@@ -96,20 +393,14 @@
 .layout-compact .linkedin-share-btn {
   margin-top: 1.5rem;
 }
-
-/* Turn the main content area into a flex container for ordering */
 .layout-compact .main-content-public {
   display: flex;
   flex-direction: column;
 }
-
-/* Make the original column wrappers disappear so we can re-order their children */
 .layout-compact .main-column-public,
 .layout-compact .sidebar-column-public {
   display: contents;
 }
-
-/* Style all sections to look like preview cards */
 .layout-compact .section-public {
   padding: 1.5rem;
   background-color: rgba(255, 255, 255, 0.03);
@@ -120,15 +411,11 @@
   background: none;
   padding: 0;
 }
-
-/* Style section titles */
 .layout-compact .section-public h3,
 .layout-compact .card-public h4 {
   border: none;
   text-align: left;
 }
-
-/* Style the grid container for projects, education, etc. */
 .layout-compact .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -145,20 +432,18 @@
 .layout-compact .skills-list-public {
   justify-content: center;
 }
-
-/* NEW: Style the contact links as buttons */
 .layout-compact .contact-section {
   display: flex;
   flex-direction: row;
   justify-content: center;
   flex-wrap: wrap;
   gap: 1rem;
-  background: none; /* Override the section background */
+  background: none;
   padding: 0;
   margin-bottom: 2rem;
 }
 .layout-compact .contact-section h4 {
-  display: none; /* Hide the "Contact" title */
+  display: none;
 }
 .layout-compact .contact-section a {
   text-decoration: none;
@@ -166,29 +451,43 @@
   border-radius: 6px;
   font-weight: 500;
   transition: all 0.2s ease;
-  border: 1px solid #64ffda; /* Default accent color */
+  border: 1px solid #64ffda;
   color: #64ffda;
 }
 .layout-compact .contact-section a:hover {
   background-color: rgba(100, 255, 218, 0.1);
 }
-
-/* NEW: Final recruiter-focused ordering */
-.layout-compact .contact-section { order: 1; }
-.layout-compact .about-section { order: 2; }
-.layout-compact .hardskills-section { order: 3; }
-.layout-compact .softskills-section { order: 4; }
-.layout-compact .projects-section { order: 5; }
-.layout-compact .certifications-section { order: 6; }
-.layout-compact .education-section { order: 7; }
-.layout-compact .blog-section-public { order: 8; }
-.layout-compact .custom-section { order: 9; }
-/* ======================================================= */
-/* === RESTORED BUTTON AND DASHBOARD ELEMENT STYLES    === */
-/* ======================================================= */
-
-/* --- General Action & Add Buttons --- */
-.action-btn, .add-btn {
+.layout-compact .contact-section {
+  order: 1;
+}
+.layout-compact .about-section {
+  order: 2;
+}
+.layout-compact .hardskills-section {
+  order: 3;
+}
+.layout-compact .softskills-section {
+  order: 4;
+}
+.layout-compact .interests-section {
+  order: 5;
+}
+.layout-compact .projects-section {
+  order: 6;
+}
+.layout-compact .certifications-section {
+  order: 7;
+}
+.layout-compact .education-section {
+  order: 8;
+}
+.layout-compact .blog-section-public {
+  order: 9;
+}
+.layout-compact .custom-section {
+  order: 10;
+}
+.action-btn {
   background-color: #64ffda;
   color: #0a192f;
   border: none;
@@ -200,18 +499,9 @@
   transition: all 0.25s ease;
   text-align: center;
 }
-
-.action-btn:hover, .add-btn:hover {
+.action-btn:hover {
   opacity: 0.8;
 }
-
-.add-btn {
-  width: 100%;
-  padding: 0.8rem;
-  margin-top: 1rem;
-}
-
-/* --- Navbar Buttons --- */
 .nav-button {
   background-color: #64ffda;
   color: #112240;
@@ -219,9 +509,8 @@
   padding: 10px 22px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1rem; /* Adjusted for consistency */
+  font-size: 1rem;
 }
-
 .nav-link-button {
   background: none;
   border: none;
@@ -237,16 +526,10 @@
 .nav-link-button:hover {
   color: #64ffda;
 }
-
 .nav-link-button.save {
   font-weight: bold;
   color: #64ffda;
 }
-/* ======================================================= */
-/* === FINAL UI POLISH & FIXES                         === */
-/* ======================================================= */
-
-/* 1. Fix for AI Enhancement Button Position */
 .ai-input-group {
   position: relative;
   display: flex;
@@ -260,26 +543,16 @@
   font-size: 1.5rem;
   cursor: pointer;
 }
-
-/* 2. Fix for Color Picker Inputs */
 .controls-section input[type="color"] {
   height: 40px;
-  padding: 5px; /* Resets padding to allow color swatch to show */
+  padding: 5px;
   cursor: pointer;
 }
-
-/* ======================================================= */
-/* ===  BUTTON STYLES FOR TWO-COLUMN CONTACT SECTION   === */
-/* ======================================================= */
-
-/* Turn the contact card into a flex container to space out the buttons */
 .layout-standard .contact-section {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* This adds space between each button */
+  gap: 0.75rem;
 }
-
-/* Style the contact links as clean, rectangular buttons */
 .layout-standard .contact-section a {
   display: block;
   text-align: center;
@@ -288,39 +561,31 @@
   border-radius: 6px;
   font-weight: 500;
   transition: all 0.2s ease;
-  background-color: rgba(255, 255, 255, 0.05); /* Subtle background */
+  background-color: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ccd6f6; /* Default light text color */
+  color: #ccd6f6;
 }
-
 .layout-standard .contact-section a:hover {
-  background-color: rgba(100, 255, 218, 0.1); /* Use accent color on hover */
+  background-color: rgba(100, 255, 218, 0.1);
   border-color: #64ffda;
   color: #64ffda;
 }
-/* Styling for the (Expected) graduation year text */
 .expected-year {
   font-style: italic;
   opacity: 0.8;
   font-size: 0.9em;
   margin-left: 4px;
 }
-/* ======================================================= */
-/* === RESTORED STYLES FOR LOGIN PAGE                  === */
-/* ======================================================= */
-
 .login-container h1 {
   color: #ccd6f6;
   font-size: 3rem;
   margin-bottom: 1rem;
 }
-
 .login-container p {
   color: #8892b0;
   font-size: 1.2rem;
   margin-bottom: 2rem;
 }
-
 .login-button {
   background-color: #64ffda;
   color: #0a192f;
@@ -332,29 +597,21 @@
   cursor: pointer;
   transition: all 0.25s ease;
 }
-
 .login-button:hover {
   opacity: 0.8;
 }
-/* ADD THIS LINE */
-.layout-compact .interests-section { order: 5; }
-/* ======================================================= */
-/* === AI-POWERED SUGGESTIONS DROPDOWN STYLES          === */
-/* ======================================================= */
-
 .suggestions-container {
   position: relative;
   width: 100%;
 }
-
 .suggestions-list {
   position: absolute;
-  top: 100%; /* Position it right below the input container */
+  top: 100%;
   left: 0;
   right: 0;
-  background-color: #233554; /* Darker navy */
+  background-color: #233554;
   border: 1px solid #64ffda;
-  border-top: none; /* Avoid double border */
+  border-top: none;
   border-radius: 0 0 4px 4px;
   list-style: none;
   padding: 0;
@@ -362,66 +619,48 @@
   max-height: 150px;
   overflow-y: auto;
   z-index: 100;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
-
 .suggestions-list li {
   padding: 10px;
   cursor: pointer;
   color: #ccd6f6;
   font-size: 0.9rem;
 }
-
 .suggestions-list li:hover {
-  background-color: #112240; /* Darkest navy */
+  background-color: #112240;
   color: #64ffda;
 }
-
-/* ======================================================= */
-/* === STYLES FOR CUSTOM TOAST MODALS                  === */
-/* ======================================================= */
-
-/* This targets the container of our custom toast */
 .modal-toast-container .Toastify__toast {
-  background-color: #112240; /* Light Navy */
+  background-color: #112240;
   border: 1px solid #64ffda;
   border-radius: 8px;
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
   width: 450px;
   padding: 1.5rem 2rem;
 }
-
-/* This makes sure our custom content fills the toast body */
 .modal-toast-container .Toastify__toast-body {
   padding: 0;
   width: 100%;
 }
-
-/* Hide the default progress bar */
 .modal-toast-container .Toastify__progress-bar {
   display: none;
 }
-
-/* Hide the default close button, we'll use our own */
 .modal-toast-container .Toastify__close-button {
   display: none;
 }
-
-/* Styles for the content INSIDE our custom modals */
 .toast-modal-content h4 {
   color: #ccd6f6;
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
   text-align: center;
 }
-
 .toast-modal-content p {
   color: #8892b0;
   margin-bottom: 1.5rem;
   text-align: center;
   line-height: 1.6;
 }
-
 .toast-modal-content input {
   width: 100%;
   padding: 0.8rem;
@@ -432,15 +671,12 @@
   font-size: 1rem;
   margin-bottom: 1rem;
 }
-
 .toast-modal-content .toast-actions {
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
   margin-top: 1rem;
 }
-
-/* Generic button style for modals */
 .toast-modal-content button {
   border: none;
   border-radius: 4px;
@@ -450,32 +686,71 @@
   cursor: pointer;
   transition: opacity 0.2s ease;
 }
-
 .toast-modal-content button:hover {
   opacity: 0.85;
 }
-
-/* Primary action button (Create, Confirm) */
 .toast-modal-content .btn-primary {
   background-color: #64ffda;
   color: #0a192f;
 }
-
-/* Destructive action button (Delete) */
 .toast-modal-content .btn-danger {
   background-color: #e63946;
   color: white;
 }
-
-/* Secondary action button (Cancel) */
 .toast-modal-content .btn-secondary {
   background-color: #233554;
   color: #8892b0;
 }
-/* --- MEDIA QUERIES --- */
+/* For Tablets and smaller devices */
 @media screen and (max-width: 960px) {
-  .panels-container { flex-direction: column; height: auto; overflow-y: auto; }
-  .controls-panel { width: 100%; height: auto; overflow-y: visible; }
-  .preview-panel { height: 100vh; }
-  .layout-standard .hero-public, .layout-standard .hero-main-content { flex-direction: column; align-items: center; text-align: center; }
+  .panels-container {
+    flex-direction: column;
+    height: auto;
+    overflow-y: auto;
+  }
+  .controls-panel {
+    width: 100%;
+    height: auto;
+    overflow-y: visible;
+  }
+  .preview-panel {
+    height: 100vh;
+  }
+  .layout-standard .hero-public,
+  .layout-standard .hero-main-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* For smaller tablets and large phones */
+@media screen and (max-width: 768px) {
+  .controls-panel {
+    padding: 1.5rem;
+  }
+  .public-portfolio-container {
+    padding: 3rem 1.5rem;
+  }
+  .login-container h1 {
+    font-size: 2.5rem;
+  }
+}
+
+/* For most mobile phones */
+@media screen and (max-width: 480px) {
+  .controls-panel {
+    padding: 1rem;
+  }
+  .public-portfolio-container {
+    padding: 2rem 1rem;
+  }
+  .hero-public {
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .profile-pic-public {
+    width: 120px;
+    height: 120px;
+  }
 }
