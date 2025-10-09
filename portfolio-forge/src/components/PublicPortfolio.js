@@ -43,15 +43,14 @@ function PublicPortfolio() {
 
   if (loading || !portfolioData) return <div className="loading-screen">Loading...</div>;
 
-  // --- YAHAN PAR FIX KIYA GAYA HAI ---
-  // customSections ke default object mein 'title' add kiya gaya hai.
   const { 
     theme = {}, 
     userName, 
     userSubtitle, 
     profilePicUrl, 
     bio, 
-    location, 
+    location,
+    address, // <-- FIX: Destructure address
     links, 
     projects = { items: [] }, 
     hardSkills = { items: [] }, 
@@ -77,6 +76,7 @@ function PublicPortfolio() {
             <h1>{userName}</h1>
             <h2 style={{ color: theme.accentColor }}>{userSubtitle}</h2>
             {location?.showOnPage && <p className="location-public">{location.value}</p>}
+            {address?.showOnPage && <p className="location-public">{address.value}</p>} 
           </div>
         </div>
         <div className="hero-actions">

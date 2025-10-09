@@ -12,6 +12,7 @@ function PreviewPanel({ portfolioData }) {
     profilePicUrl,
     bio = '',
     location = {},
+    address = {}, 
     education = {},
     hardSkills = { showOnPage: true, items: [] },
     softSkills = { showOnPage: true, items: [] },
@@ -71,6 +72,7 @@ function PreviewPanel({ portfolioData }) {
             ${profilePicUrl ? `<img src="${profilePicUrl}" alt="Profile" class="profile-pic">` : ''}
             <h1>${userName}</h1><h2 class="accent">${userSubtitle}</h2>
             ${location?.showOnPage ? `<p>${location.value}</p>` : ''}
+            ${address?.showOnPage ? `<p>${address.value}</p>` : ''} 
         </header>
         <section class="section"><h3>About Me</h3><p>${bio}</p></section>
         ${hardSkills?.showOnPage && hardSkills?.items?.length > 0 ? `<section class="section"><h3>Hard Skills</h3><ul class="skills-list">${hardSkills.items.map(skill => `<li>${skill}</li>`).join('')}</ul></section>` : ''}
@@ -89,16 +91,14 @@ function PreviewPanel({ portfolioData }) {
             </div>
         </section>` : ''}
 
-${blogPosts?.showOnPage && blogPosts?.items?.length > 0 ? `<section class="section"><h3>Blog Posts</h3><div class="grid">${blogPosts.items.map(p => `<div class="card"><h4>${p.title}</h4><p>${p.content}</p></div>`).join('')}</div></section>` : ''}
-${customSections?.showOnPage && customSections?.items?.length > 0 ? `<section class="section"><h3>${customSections.title || 'Custom Section'}</h3><div class="grid">${customSections.items.map(item => `<div class="card"><h4>${item.title}</h4><p>${item.content}</p></div>`).join('')}</div></section>` : ''}
-      </body>
+        ${blogPosts?.showOnPage && blogPosts?.items?.length > 0 ? `<section class="section"><h3>Blog Posts</h3><div class="grid">${blogPosts.items.map(p => `<div class="card"><h4>${p.title}</h4><p>${p.content}</p></div>`).join('')}</div></section>` : ''}
+        ${customSections?.showOnPage && customSections?.items?.length > 0 ? `<section class="section"><h3>${customSections.title || 'Custom Section'}</h3><div class="grid">${customSections.items.map(item => `<div class="card"><h4>${item.title}</h4><p>${item.content}</p></div>`).join('')}</div></section>` : ''}
       </body>
     </html>
   `;
 
   return (
     <main className="preview-panel">
-      {/* --- THE FIX IS HERE: The key will change when data changes, forcing a re-render --- */}
       <iframe
         id="portfolio-preview"
         key={JSON.stringify(portfolioData)}
