@@ -169,7 +169,16 @@
 
 /* --- FIX START: Corrected "Choose File" button styling --- */
 .profile-pic-area input[type="file"] {
-  display: none; /* Keep the actual input hidden */
+  /* This is a more robust way to hide the input on all devices, including mobile */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Apply styles directly to the custom-styled label */
