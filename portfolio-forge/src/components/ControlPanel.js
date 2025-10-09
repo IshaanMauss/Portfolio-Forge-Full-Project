@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
-import { auth, storage } from '../firebase/config';
+import React, { useState, useEffect } from 'react';
+import { auth, storage, db } from '../firebase/config';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-toastify';
 import { getEnhancedText } from '../api/enhanceAPI';
 import { getEnhancedDescription } from '../api/mockEnhanceAPI';
 import ToggleSwitch from './ToggleSwitch';
+import FeedbackViewer from './FeedbackViewer';
 
 function ControlPanel({ portfolioData, updatePortfolio }) {
-  // States for new items
   const [newProject, setNewProject] = useState({ title: '', keywords: '', description: '', githubUrl: '', liveUrl: '' });
   const [newHardSkill, setNewHardSkill] = useState('');
   const [newSoftSkill, setNewSoftSkill] = useState('');
@@ -15,29 +16,61 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
   const [newCertification, setNewCertification] = useState({ name: '', issuer: '' });
   const [newBlogPost, setNewBlogPost] = useState({ title: '', content: '' });
   const [newCustomItem, setNewCustomItem] = useState({ title: '', content: '' });
-
-  // States for UI logic
   const [editingIndex, setEditingIndex] = useState({ field: null, index: null });
   const [isUploading, setIsUploading] = useState(false);
   const [aiLoading, setAiLoading] = useState({});
   const [suggestions, setSuggestions] = useState([]);
   const [activeSuggestionField, setActiveSuggestionField] = useState(null);
+  const [feedbackList, setFeedbackList] = useState([]);
+  const [feedbackLoading, setFeedbackLoading] = useState(true);
 
-  if (!portfolioData) {
-    return <aside className="controls-panel">Loading controls...</aside>;
-  }
+  useEffect(() => {
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
 
+    const adminUid = 'EOkMDXUnHeTahNvuvLRiOOjG4LJ3';
+
+    if (currentUser.uid === adminUid) {
+        const feedbackRef = collection(db, 'app-feedback');
+        const q = query(feedbackRef, orderBy('timestamp', 'desc'));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const feedbacks = [];
+            querySnapshot.forEach((doc) => {
+                feedbacks.push({ id: doc.id, ...doc.data() });
+            });
+            setFeedbackList(feedbacks);
+            setFeedbackLoading(false);
+        }, (error) => {
+            console.error("Error fetching feedback:", error);
+            setFeedbackLoading(false);
+        });
+        return () => unsubscribe();
+    } else {
+        setFeedbackLoading(false);
+    }
+  }, []);
+  
+  // --- THIS IS THE MAIN FIX ---
+  // This function now saves two versions of the image.
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
     if (!file || !auth.currentUser) return;
     setIsUploading(true);
+
+    // 1. Create a local Base64 version to prevent CORS errors in the PDF.
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = () => { updatePortfolio('profilePicDataUrl', reader.result); };
+    reader.onload = () => {
+      // Save this local version to your portfolio state.
+      updatePortfolio('profilePicDataUrl', reader.result);
+    };
+
+    // 2. Upload the file to Firebase Storage for the live portfolio URL.
     const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}/${file.name}`);
     try {
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
+      // Save the live URL to your portfolio state.
       updatePortfolio('profilePicUrl', downloadURL);
       toast.success("Profile picture updated!");
     } catch (error) {
@@ -48,6 +81,52 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
     }
   };
 
+  const handleExportFeedback = () => {
+    if (feedbackList.length === 0) {
+      toast.warn("No feedback to export.");
+      return;
+    }
+
+    const feedbackHtml = feedbackList.map(fb => `
+      <div style="border: 1px solid #ccc; border-radius: 8px; padding: 15px; margin-bottom: 15px; font-family: sans-serif; background-color: #fff;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+          <p style="font-size: 1.5em; color: #ffc107; margin: 0;">${'★'.repeat(fb.rating)}${'☆'.repeat(5 - fb.rating)}</p>
+          <p style="color: #555; font-size: 0.9em; margin: 0;">${fb.timestamp ? new Date(fb.timestamp.toDate()).toLocaleString() : 'N/A'}</p>
+        </div>
+        <p style="font-style: italic; color: #333; margin: 0;">"${fb.comment}"</p>
+        <p style="font-size: 0.8em; color: #777; margin-top: 10px; text-align: right;">From: ${fb.submitterEmail || 'Anonymous'}</p>
+      </div>
+    `).join('');
+
+    const fullHtml = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>App Feedback for Portfolio Forge</title>
+        <style> body { font-family: sans-serif; background-color: #f4f4f4; padding: 20px; } </style>
+      </head>
+      <body>
+        <h1>App Feedback for Portfolio Forge</h1>
+        ${feedbackHtml}
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([fullHtml], { type: 'text/html' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'app_feedback_dashboard.html';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Feedback exported to HTML!");
+  };
+
+  if (!portfolioData) {
+    return <aside className="controls-panel">Loading controls...</aside>;
+  }
+  
   const handleEditItem = (field, index) => {
     const itemToEdit = portfolioData[field].items[index];
     const sectionElement = document.getElementById(`${field}-section`);
@@ -61,7 +140,6 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
       sectionElement.scrollIntoView({ behavior: 'smooth' });
     }
   };
-
   const cancelEdit = () => {
     setEditingIndex({ field: null, index: null });
     setNewProject({ title: '', keywords: '', description: '', githubUrl: '', liveUrl: '' });
@@ -69,18 +147,15 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
     setNewBlogPost({ title: '', content: '' });
     setNewCustomItem({ title: '', content: '' });
   };
-
   const handleSubmitItem = (field, newItem, resetter) => {
     const itemName = field.slice(0, -1);
     if ((typeof newItem === 'object' && !newItem.title && !newItem.name) && (typeof newItem !== 'string')) {
         toast.warn(`Please fill out the required fields for the new ${itemName}.`);
         return;
     }
-    
     const updater = (prevSection) => {
       const newSection = { ...(prevSection || { items: [], showOnPage: false }) };
       const wasEmpty = (newSection.items || []).length === 0;
-
       if (editingIndex.field === field && editingIndex.index !== null) {
         newSection.items = (newSection.items || []).map((item, index) => 
           index === editingIndex.index ? newItem : item
@@ -95,9 +170,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
       }
       return newSection;
     };
-
     updatePortfolio(field, updater);
-
     resetter(field === 'projects' ? { title: '', keywords: '', description: '', githubUrl: '', liveUrl: '' }
            : field === 'certifications' ? { name: '', issuer: '' }
            : field === 'blogPosts' ? { title: '', content: '' }
@@ -105,40 +178,32 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
            : '');
     cancelEdit();
   };
-
   const handleAddTag = (field, newItem, resetter) => {
     if (!newItem.trim()) return;
-    
     const updater = (prevSection) => {
         const newSection = { ...(prevSection || { items: [], showOnPage: false }) };
         const wasEmpty = (newSection.items || []).length === 0;
-        
         const lowercasedItems = (newSection.items || []).map(item => item.toLowerCase());
         if (lowercasedItems.includes(newItem.toLowerCase())) {
             toast.warn(`${newItem} is already in your list.`);
             return prevSection;
         }
-
         newSection.items = [newItem, ...(newSection.items || [])];
         if (wasEmpty) {
-            newSection.showOnPage = true;
+          newSection.showOnPage = true;
         }
         toast.info(`${field.slice(0, -1)} added!`);
         return newSection;
     };
-
     updatePortfolio(field, updater);
-
     resetter('');
     setSuggestions([]);
     setActiveSuggestionField(null);
   };
-  
   const handleRemoveItem = (field, index) => {
     const updater = (prevItems) => (prevItems || []).filter((_, i) => i !== index);
     updatePortfolio(`${field}.items`, updater);
   };
-  
   const handleAiEnhance = async (type) => {
     let payload = {};
     if (type === 'bio') {
@@ -159,23 +224,17 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
     }
     setAiLoading(prev => ({ ...prev, [type]: false }));
   };
-
-  // --- FIX START: Changed how the API is called ---
   const fetchSuggestions = async (type, partial) => {
     if (!partial || partial.length < 2) { setSuggestions([]); return; }
-    // No longer combining hard and soft skills into a generic 'skills' type
     const response = await getEnhancedDescription(type, { partial });
     if (response && response.suggestions) {
         setSuggestions(response.suggestions.slice(0, 5));
     }
   };
-  // --- FIX END ---
-
   const handleInputChange = (setter, fieldType) => (e) => { 
     setter(e.target.value); 
     if (fieldType) { fetchSuggestions(fieldType, e.target.value); setActiveSuggestionField(fieldType); } 
   };
-  
   const handleSuggestionClick = (field, resetter, suggestion) => { 
     handleAddTag(field, suggestion, resetter); 
   };
@@ -218,6 +277,18 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <label>GitHub URL</label>
         <input type="url" value={portfolioData.links?.github || ''} onChange={e => updatePortfolio('links.github', e.target.value)} />
       </details>
+      
+      {auth.currentUser?.uid === 'EOkMDXUnHeTahNvuvLRiOOjG4LJ3' && (
+        <details className="controls-section">
+          <summary><h3>App Feedback</h3></summary>
+          <FeedbackViewer feedbackList={feedbackList} loading={feedbackLoading} />
+          <div className="form-actions" style={{ marginTop: '1.5rem' }}>
+            <button className="add-btn" onClick={handleExportFeedback}>
+              Export Feedback as HTML
+            </button>
+          </div>
+        </details>
+      )}
       <details className="controls-section">
         <summary><h3>Hard Skills</h3></summary>
         <ToggleSwitch label="Show on page" checked={portfolioData.hardSkills?.showOnPage !== false} onChange={() => updatePortfolio('hardSkills.showOnPage', !portfolioData.hardSkills?.showOnPage)} />

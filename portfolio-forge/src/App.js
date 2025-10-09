@@ -220,7 +220,10 @@ function App() {
           }
         />
         <Route path="/p/:userId/:versionId?" element={<PublicPortfolio />} />
-        <Route path="/resume/:userId/:versionId?" element={<Resume />} />
+        
+        {/* --- FIX IS HERE: Pass the 'user' object to the Resume component --- */}
+        <Route path="/resume/:userId/:versionId?" element={<Resume user={user} />} />
+        
       </Routes>
     </>
   );

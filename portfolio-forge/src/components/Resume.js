@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { db } from '../firebase/config';
+import { db, auth } from '../firebase/config';
 import { doc, getDoc } from 'firebase/firestore';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ToggleSwitch from './ToggleSwitch';
 import './Resume.css';
 import { toast } from 'react-toastify';
+import FeedbackToast from './FeedbackToast';
 
-function Resume() {
+function Resume({ user }) {
   const { userId, versionId } = useParams();
   const [portfolioData, setPortfolioData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -41,8 +42,6 @@ function Resume() {
     return parseInt(year) > currentYear;
   };
 
-  // ... (existing imports and other code above exportToPdf function) ...
-
   const exportToPdf = () => {
     const resumeElement = document.getElementById('resume-content');
     const { userName = 'User' } = portfolioData;
@@ -57,10 +56,10 @@ function Resume() {
     window.scrollTo(0, 0);
 
     html2canvas(resumeElement, {
-        scale: 2.5, // **CHANGED: A balanced scale for great quality and smaller size**
+        scale: 2.5,
         useCORS: true,
         logging: true,
-        dpi: 192, // **CHANGED: Reduced DPI, still great for screens**
+        dpi: 192,
         letterRendering: true,
     }).then(canvas => {
         const pdf = new jsPDF('p', 'mm', 'a4');
@@ -82,12 +81,9 @@ function Resume() {
             x_offset = (pdfWidth - imgWidth) / 2;
         }
 
-        // **THE KEY CHANGE: Convert canvas to JPEG format with medium quality**
-        const imageData = canvas.toDataURL('image/jpeg', 0.9); // 0.9 is 90% quality
-
+        const imageData = canvas.toDataURL('image/jpeg', 0.9);
         pdf.addImage(imageData, 'JPEG', x_offset, y_offset, imgWidth, imgHeight, null, 'MEDIUM');
 
-        // --- ADD CLICKABLE LINKS (This logic remains the same) ---
         const scaleFactor = imgWidth / resumeElement.offsetWidth;
         const resumeRect = resumeElement.getBoundingClientRect();
 
@@ -110,6 +106,18 @@ function Resume() {
         pdf.save(`${userName.replace(/\s+/g, '_')}_Resume.pdf`);
         toast.success("PDF Downloaded!");
 
+        setTimeout(() => {
+          if (toast.isActive('feedback-toast')) return;
+          toast(<FeedbackToast userId={userId} currentUser={user} />, {
+            toastId: 'feedback-toast',
+            className: 'modal-toast-container',
+            position: "top-center",
+            autoClose: false,
+            closeOnClick: false,
+            draggable: false,
+          });
+        }, 2000);
+
     }).catch(err => {
         console.error("PDF Generation Error:", err);
         toast.error("Could not generate PDF. Check console for details.");
@@ -118,7 +126,6 @@ function Resume() {
     });
   };
 
-// ... (rest of the component code below exportToPdf function) ...
   if (loading) return <div className="loading-screen">Loading Resume...</div>;
   if (!portfolioData) return <div className="loading-screen">Could not find resume data.</div>;
 
@@ -138,7 +145,8 @@ function Resume() {
     '--header-color': theme.textColor || '#112240',
   };
 
-  // Prioritize the Data URL for the image source to bypass CORS completely
+  // --- THIS IS THE SECOND FIX ---
+  // Prioritize the local Data URL to prevent CORS errors.
   const imageToDisplay = profilePicDataUrl || profilePicUrl;
 
   return (
@@ -151,6 +159,7 @@ function Resume() {
       </div>
       <div id="resume-content" className={`resume-container ${applyTheme ? 'theme-applied' : ''}`} style={applyTheme ? dynamicStyles : {}}>
         <header className="resume-header">
+          {/* Use the safe image source and keep crossOrigin for fallback */}
           {imageToDisplay && <img id="resume-profile-pic" src={imageToDisplay} alt="Profile" crossOrigin="anonymous" className="profile-pic-resume" />}
           <h1>{userName}</h1>
           <p className="subtitle">{userSubtitle}</p>
