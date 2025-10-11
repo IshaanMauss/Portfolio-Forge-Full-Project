@@ -26,7 +26,7 @@ function FeedbackForm({ closeToast, portfolioOwnerId, currentUser }) {
     }
     setIsSubmitting(true);
     try {
-      await addDoc(collection(db, 'app-feedback'), {
+      await addDoc(collection(db, 'feedback'), {
         portfolioContextId: portfolioOwnerId,
         
         // --- FIX: Use the 'currentUser' from props ---
