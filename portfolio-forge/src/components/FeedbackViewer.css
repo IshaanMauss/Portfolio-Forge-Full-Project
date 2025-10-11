@@ -47,3 +47,12 @@
   width: 100%;
   font-size: 0.95rem;
 }
+
+/* --- FIX: Style for the new email text --- */
+.feedback-email {
+  width: 100%;
+  text-align: right;
+  font-size: 0.8em;
+  color: #8892b0; /* Slate color */
+  margin-top: 5px;
+}

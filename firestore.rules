@@ -2,18 +2,21 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // This is your existing rule, which is correct
+
+    // Portfolio wala rule waisa hi rahega
     match /portfolios/{userId} {
-      allow read, write: if request.auth.uid == userId;
+      allow read, write, delete: if request.auth.uid == userId;
     }
 
-    // This is the new rule you need to add for the feedback system
+    // Feedback wala rule ab Custom Claim check karega
     match /feedback/{feedbackId} {
-      // Allows anyone (even not logged in) to create (submit) feedback
-      allow create: if true;
+      // Feedback create koi bhi logged-in user kar sakta hai
+      allow create: if request.auth != null;
 
-      // Allows only the portfolio owner to read or delete their feedback
-      allow read, delete: if request.auth != null && request.auth.uid == resource.data.portfolioOwnerId;
+      // --- YEH HAI ASLI SECURITY ---
+      // Feedback read/list sirf woh user kar sakta hai jiske token mein
+      // 'admin' ka tag 'true' set ho.
+      allow read, list: if request.auth.token.admin == true;
     }
   }
 }
