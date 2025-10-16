@@ -87,7 +87,7 @@ function Resume({ user }) {
         const scaleFactor = imgWidth / resumeElement.offsetWidth;
         const resumeRect = resumeElement.getBoundingClientRect();
 
-        ['email-link', 'linkedin-link', 'github-link'].forEach(id => {
+        ['email-link', 'linkedin-link', 'github-link', 'portfolio-link'].forEach(id => {
             const linkEl = document.getElementById(id);
             if (linkEl) {
                 const rect = linkEl.getBoundingClientRect();
@@ -131,6 +131,7 @@ function Resume({ user }) {
 
   const {
     userName, userSubtitle, location, links, bio,
+    portfolioLink,
     hardSkills = { items: [] }, softSkills = { items: [] },
     interests = { items: [] }, certifications = { items: [] },
     projects = { items: [] }, education, 
@@ -168,6 +169,7 @@ function Resume({ user }) {
             {links?.email && <> | <a id="email-link" href={`mailto:${links.email}`}>{links.email}</a></>}
             {links?.linkedin && <> | <a id="linkedin-link" href={formatUrl(links.linkedin)} target="_blank" rel="noopener noreferrer">LinkedIn</a></>}
             {links?.github && <> | <a id="github-link" href={formatUrl(links.github)} target="_blank" rel="noopener noreferrer">GitHub</a></>}
+            {portfolioLink?.showOnPage && portfolioLink.value && <> | <a id="portfolio-link" href={formatUrl(portfolioLink.value)} target="_blank" rel="noopener noreferrer">Portfolio</a></>}
           </div>
         </header>
         <main className="resume-main">

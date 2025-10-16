@@ -81,6 +81,7 @@ function PublicPortfolio() {
     location,
     address,
     links, 
+    portfolioLink,
     projects = { items: [] }, 
     hardSkills = { items: [] }, 
     softSkills = { items: [] }, 
@@ -109,6 +110,11 @@ function PublicPortfolio() {
           </div>
         </div>
         <div className="hero-actions">
+           {portfolioLink?.showOnPage && portfolioLink.value && (
+             <a href={formatUrl(portfolioLink.value)} target="_blank" rel="noopener noreferrer" className="portfolio-link-btn-public">
+              View My Works
+            </a>
+          )}
           {currentUser && currentUser.uid === userId && (
             <a 
               href={linkedInShareUrl} 

@@ -320,6 +320,15 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <input type="url" value={portfolioData.links?.github || ''} onChange={e => updatePortfolio('links.github', e.target.value)} />
       </details>
 
+      <details className="controls-section">
+        <summary><h3>Portfolio Link</h3></summary>
+        <label>Portfolio Website URL</label>
+        <div className="visibility-group">
+            <input type="url" value={portfolioData.portfolioLink?.value || ''} onChange={e => updatePortfolio('portfolioLink.value', e.target.value)} />
+            <ToggleSwitch label="Show" checked={portfolioData.portfolioLink?.showOnPage !== false} onChange={() => updatePortfolio('portfolioLink.showOnPage', !portfolioData.portfolioLink?.showOnPage)} />
+        </div>
+      </details>
+
       {isAdmin &&  (
         <details className="controls-section">
           <summary><h3>App Feedback</h3></summary>

@@ -20,13 +20,20 @@ function PreviewPanel({ portfolioData }) {
     certifications = { showOnPage: true, items: [] },
     projects = { showOnPage: true, items: [] },
     blogPosts = { showOnPage: false, items: [] },
-    customSections = { title: 'Custom Section', showOnPage: false, items: [] }
+    customSections = { title: 'Custom Section', showOnPage: false, items: [] },
+    portfolioLink = {}
   } = portfolioData;
 
   const isFutureYear = (year) => {
     if (!year || isNaN(year)) return false;
     const currentYear = new Date().getFullYear();
     return parseInt(year) > currentYear;
+  };
+
+  const formatUrl = (url) => {
+    if (!url) return '';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    return `https://${url}`;
   };
 
   const generateThemeStyles = () => `
@@ -58,6 +65,16 @@ function PreviewPanel({ portfolioData }) {
       .skills-list { display: flex; flex-wrap: wrap; gap: 0.5rem; padding: 0; list-style: none; justify-content: center; }
       .skills-list li { background-color: ${theme.accentColor || '#64ffda'}; color: ${theme.backgroundColor || '#0a192f'}; padding: 0.3rem 0.8rem; border-radius: 20px; font-weight: 500;}
       .expected-year { font-style: italic; opacity: 0.8; font-size: 0.9em; }
+      .portfolio-link-btn {
+        display: inline-block;
+        padding: 0.8rem 1.5rem;
+        background-color: ${theme.accentColor || '#64ffda'};
+        color: ${theme.backgroundColor || '#0a192f'};
+        border-radius: 6px;
+        font-weight: bold;
+        margin-top: 1rem;
+        text-decoration: none;
+      }
     </style>
   `;
 
@@ -73,6 +90,7 @@ function PreviewPanel({ portfolioData }) {
             <h1>${userName}</h1><h2 class="accent">${userSubtitle}</h2>
             ${location?.showOnPage ? `<p>${location.value}</p>` : ''}
             ${address?.showOnPage ? `<p>${address.value}</p>` : ''} 
+            ${portfolioLink?.showOnPage && portfolioLink?.value ? `<a href="${formatUrl(portfolioLink.value)}" class="portfolio-link-btn" target="_blank">View My Works</a>` : ''}
         </header>
         <section class="section"><h3>About Me</h3><p>${bio}</p></section>
         ${hardSkills?.showOnPage && hardSkills?.items?.length > 0 ? `<section class="section"><h3>Hard Skills</h3><ul class="skills-list">${hardSkills.items.map(skill => `<li>${skill}</li>`).join('')}</ul></section>` : ''}

@@ -53,6 +53,7 @@ function App() {
         location: { value: '', showOnPage: true }, 
         address: { value: '', showOnPage: false }, 
         links: { linkedin: '', github: '', email: currentUser.email || '' }, 
+        portfolioLink: { value: '', showOnPage: true },
         hardSkills: { showOnPage: true, items: [] }, 
         softSkills: { showOnPage: true, items: [] }, 
         interests: { showOnPage: true, items: [] },
