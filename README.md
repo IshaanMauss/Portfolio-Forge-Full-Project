@@ -3,8 +3,6 @@ A full-stack web application designed to empower users to effortlessly create, m
 
 ➡️ Live Demo Here (https://portfolio-forge-4e0a9.web.app/)
 
-📸 Screenshots
-(It's highly recommended to add screenshots here to give a visual overview of your application.)
 
 ✨ Core Features
 Seamless Authentication: Secure and easy login/signup using Google Authentication (via Firebase).
