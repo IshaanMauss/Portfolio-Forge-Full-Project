@@ -10,6 +10,8 @@ function PreviewPanel({ portfolioData }) {
     userName = 'Your Name',
     userSubtitle = 'Your Subtitle',
     profilePicUrl,
+    // --- FIX: Get the local data URL ---
+    profilePicDataUrl,
     bio = '',
     location = {},
     address = {}, 
@@ -86,7 +88,8 @@ function PreviewPanel({ portfolioData }) {
       </head>
       <body>
         <header class="header section">
-            ${profilePicUrl ? `<img src="${profilePicUrl}" alt="Profile" class="profile-pic">` : ''}
+        
+            ${(profilePicDataUrl || profilePicUrl) ? `<img src="${profilePicDataUrl || profilePicUrl}" alt="Profile" class="profile-pic">` : ''}
             <h1>${userName}</h1><h2 class="accent">${userSubtitle}</h2>
             ${location?.showOnPage ? `<p>${location.value}</p>` : ''}
             ${address?.showOnPage ? `<p>${address.value}</p>` : ''} 

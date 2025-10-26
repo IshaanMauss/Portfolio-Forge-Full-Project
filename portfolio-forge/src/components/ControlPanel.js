@@ -108,6 +108,9 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
       updatePortfolio('profilePicUrl', downloadURL);
+      // --- FIX: Clear the local data URL after a successful upload ---
+      // This ensures the final `profilePicUrl` is the source of truth
+      updatePortfolio('profilePicDataUrl', '');
       toast.success("Profile picture updated!");
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -287,7 +290,14 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <summary><h3>Profile & Contact</h3></summary>
         <label>Profile Picture</label>
         <div className="profile-pic-area">
-          {portfolioData.profilePicUrl && <img src={portfolioData.profilePicUrl} alt="Profile Preview" className="profile-pic-preview" />}
+          {/* --- FIX: Prioritize local data URL for instant preview --- */}
+          {(portfolioData.profilePicDataUrl || portfolioData.profilePicUrl) && (
+            <img 
+              src={portfolioData.profilePicDataUrl || portfolioData.profilePicUrl} 
+              alt="Profile Preview" 
+              className="profile-pic-preview" 
+            />
+          )}
           <input type="file" id="file-upload" accept="image/*" onChange={handleProfilePicUpload} disabled={isUploading} />
           <label htmlFor="file-upload" className="custom-file-upload">Choose File</label>
           {isUploading && <p>Uploading...</p>}

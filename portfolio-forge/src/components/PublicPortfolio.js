@@ -11,14 +11,12 @@ function PublicPortfolio() {
   const [loading, setLoading] = useState(true);
   const [currentPageUrl, setCurrentPageUrl] = useState('');
   
-  // --- FIX IS HERE: We now get the current user directly ---
   const currentUser = auth.currentUser;
 
   useEffect(() => {
     const showFeedbackToast = () => {
       if (toast.isActive('feedback-toast')) return;
       
-      // --- FIX IS HERE: Pass the 'currentUser' to the toast ---
       toast(<FeedbackToast userId={userId} currentUser={currentUser} />, {
         toastId: 'feedback-toast',
         className: 'modal-toast-container',
@@ -37,7 +35,7 @@ function PublicPortfolio() {
     };
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [userId, currentUser]); // Added currentUser to dependency array
+  }, [userId, currentUser]);
 
 
   useEffect(() => {
@@ -77,6 +75,8 @@ function PublicPortfolio() {
     userName, 
     userSubtitle, 
     profilePicUrl, 
+    // --- FIX 1: Get the profilePicDataUrl ---
+    profilePicDataUrl,
     bio, 
     location,
     address,
@@ -92,6 +92,9 @@ function PublicPortfolio() {
     customSections = { title: 'Custom Section', showOnPage: false, items: [] } 
   } = portfolioData;
   
+  // --- FIX 2: Prioritize the saved data URL, just like in Resume.js ---
+  const imageToDisplay = profilePicDataUrl || profilePicUrl;
+
   const layoutClass = theme.layout === 'compact' ? 'layout-compact' : 'layout-standard';
   const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentPageUrl)}`;
 
@@ -101,7 +104,8 @@ function PublicPortfolio() {
     <div className={`public-portfolio-container ${layoutClass}`} style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}>
       <header className="hero-public">
         <div className="hero-main-content">
-          {profilePicUrl && <img src={profilePicUrl} alt="Profile" className="profile-pic-public" style={{ borderColor: theme.accentColor }}/>}
+          {/* --- FIX 3: Use the 'imageToDisplay' variable --- */}
+          {imageToDisplay && <img src={imageToDisplay} alt="Profile" className="profile-pic-public" style={{ borderColor: theme.accentColor }}/>}
           <div className="hero-text">
             <h1>{userName}</h1>
             <h2 style={{ color: theme.accentColor }}>{userSubtitle}</h2>
