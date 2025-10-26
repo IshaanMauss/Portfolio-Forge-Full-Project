@@ -60,8 +60,12 @@ function App() {
         certifications: { showOnPage: true, items: [] }, 
         education: { college: { name: '', course: '', gradYear: '', showOnPage: true }, class12: { school: '', percentage: '', board: '', passingYear: '', showOnPage: false }, class10: { school: '', percentage: '', board: '', passingYear: '', showOnPage: false }, }, 
         projects: { showOnPage: true, items: [] }, 
-        blogPosts: { showOnPage: false, items: [] },
-        customSections: { title: 'Custom Section', showOnPage: false, items: [] }, 
+        
+        // --- FIX IS HERE ---
+        blogPosts: { showOnPage: false, showOnResume: false, items: [] },
+        customSections: { title: 'Custom Section', showOnPage: false, showOnResume: false, items: [] }, 
+        // --- END OF FIX ---
+
         theme: { font: 'Poppins', backgroundColor: '#0a192f', textColor: '#ccd6f6', accentColor: '#64ffda', layout: 'standard', },
       }
     }
@@ -222,7 +226,6 @@ function App() {
         />
         <Route path="/p/:userId/:versionId?" element={<PublicPortfolio />} />
         
-        {/* --- FIX IS HERE: Pass the 'user' object to the Resume component --- */}
         <Route path="/resume/:userId/:versionId?" element={<Resume user={user} />} />
         
       </Routes>

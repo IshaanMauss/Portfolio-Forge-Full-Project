@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { db, auth } from '../firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
+// --- FIX: 'getDoc' ko 'onSnapshot' se replace karein ---
+import { doc, onSnapshot } from 'firebase/firestore'; 
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ToggleSwitch from './ToggleSwitch';
@@ -16,19 +17,36 @@ function Resume({ user }) {
   const [applyTheme, setApplyTheme] = useState(false);
 
   useEffect(() => {
-    const fetchPortfolio = async () => {
-      if (!userId) { setLoading(false); return; }
-      const docRef = doc(db, "portfolios", userId);
-      const docSnap = await getDoc(docRef);
+    // --- YEH HAI ASLI FIX ---
+    // Hum 'getDoc' (jo ek baar chalta hai) ko 'onSnapshot' (jo real-time hai) se badal denge.
+    if (!userId) { 
+      setLoading(false); 
+      return; 
+    }
+    const docRef = doc(db, "portfolios", userId);
+    
+    // onSnapshot ek 'unsubscribe' function return karta hai
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         const fullData = docSnap.data();
         const versionToShow = versionId || fullData.meta?.activeVersion || 'default';
         setPortfolioData(fullData.portfolios[versionToShow]);
+      } else {
+        // Agar user ka data exist nahi karta
+        setPortfolioData(null);
       }
       setLoading(false);
-    };
-    fetchPortfolio();
-  }, [userId, versionId]);
+    }, (error) => {
+      // Error handling
+      console.error("Error fetching resume data:", error);
+      toast.error("Could not load resume data.");
+      setLoading(false);
+    });
+
+    // Yeh 'cleanup' function hai. Jab component unload hoga, toh yeh listener band ho jayega.
+    return () => unsubscribe();
+    
+  }, [userId, versionId]); // Dependency array wahi rahega
 
   const formatUrl = (url) => {
     if (!url) return '';
@@ -135,7 +153,13 @@ function Resume({ user }) {
     hardSkills = { items: [] }, softSkills = { items: [] },
     interests = { items: [] }, certifications = { items: [] },
     projects = { items: [] }, education, 
-    profilePicUrl, profilePicDataUrl, // Get the new Data URL field
+    profilePicUrl, profilePicDataUrl,
+    
+    // --- FIX: Get the new properties ---
+    blogPosts = { items: [] },
+    customSections = { items: [] },
+    // --- END OF FIX ---
+
     theme = {}
   } = portfolioData;
 
@@ -145,9 +169,8 @@ function Resume({ user }) {
     '--text-color': theme.textColor || '#333',
     '--header-color': theme.textColor || '#112240',
   };
-
-  // --- THIS IS THE SECOND FIX ---
-  // Prioritize the local Data URL to prevent CORS errors.
+  
+  // Yeh logic bilkul sahi hai aur ab hamesha kaam karega
   const imageToDisplay = profilePicDataUrl || profilePicUrl;
 
   return (
@@ -160,7 +183,6 @@ function Resume({ user }) {
       </div>
       <div id="resume-content" className={`resume-container ${applyTheme ? 'theme-applied' : ''}`} style={applyTheme ? dynamicStyles : {}}>
         <header className="resume-header">
-          {/* Use the safe image source and keep crossOrigin for fallback */}
           {imageToDisplay && <img id="resume-profile-pic" src={imageToDisplay} alt="Profile" crossOrigin="anonymous" className="profile-pic-resume" />}
           <h1>{userName}</h1>
           <p className="subtitle">{userSubtitle}</p>
@@ -175,13 +197,27 @@ function Resume({ user }) {
         <main className="resume-main">
           <div className="main-col-resume">
             <section><h2>About Me</h2><p>{bio}</p></section>
+            
+            {/* This section remains controlled by 'showOnPage' as requested */}
             {projects?.showOnPage && projects.items.length > 0 && <section><h2>Projects</h2>{projects.items.map((p, i) => (<div key={i} className="project-item-resume"><h3>{p.title}</h3><p>{p.description}</p></div>))}</section>}
+            
+            {/* This section remains controlled by 'showOnPage' as requested */}
             {certifications?.showOnPage && certifications.items.length > 0 && <section><h2>Certifications</h2>{certifications.items.map((c, i) => (<div key={i} className="certification-item-resume"><h3>{c.name}</h3><p>{c.issuer}</p></div>))}</section>}
+            
+            {/* --- FIX IS HERE: Use 'showOnResume' --- */}
+            {blogPosts?.showOnResume && blogPosts.items.length > 0 && <section><h2>Blog Posts</h2>{blogPosts.items.map((p, i) => (<div key={i} className="project-item-resume"><h3>{p.title}</h3><p>{p.content}</p></div>))}</section>}
+            
+            {/* --- FIX IS HERE: Use 'showOnResume' --- */}
+            {customSections?.showOnResume && customSections.items.length > 0 && <section><h2>{customSections.title || 'Custom Section'}</h2>{customSections.items.map((item, i) => (<div key={i} className="project-item-resume"><h3>{item.title}</h3><p>{item.content}</p></div>))}</section>}
+          
           </div>
           <div className="sidebar-col-resume">
+            
+            {/* These sections remain controlled by 'showOnPage' as requested */}
             {hardSkills?.showOnPage && hardSkills.items.length > 0 && <section><h2>Hard Skills</h2><ul className="skills-list-resume">{hardSkills.items.map(s => <li key={s}>{s}</li>)}</ul></section>}
             {softSkills?.showOnPage && softSkills.items.length > 0 && <section><h2>Soft Skills</h2><ul className="skills-list-resume">{softSkills.items.map(s => <li key={s}>{s}</li>)}</ul></section>}
             {interests?.showOnPage && interests.items.length > 0 && <section><h2>Interests</h2><ul className="skills-list-resume">{interests.items.map(i => <li key={i}>{i}</li>)}</ul></section>}
+            
             {(education?.college?.showOnPage || education?.class12?.showOnPage || education?.class10?.showOnPage) && (
               <section>
                 <h2>Education</h2>

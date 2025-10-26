@@ -778,3 +778,12 @@
     height: 120px;
   }
 }
+/* Add this new class definition at the end of your src/App.css file */
+
+.toggle-group {
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap; /* Allows toggles to stack on small screens */
+  gap: 2rem;
+  margin-bottom: 1rem; /* Adds space below the group */
+}

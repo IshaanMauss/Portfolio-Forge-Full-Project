@@ -98,19 +98,28 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
     const file = e.target.files[0];
     if (!file || !auth.currentUser) return;
     setIsUploading(true);
+    
+    // --- YEH "SMART METHOD" HAI ---
+    // Hum file ko hamesha local data URL (base64) mein convert karte hain
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = () => {
+      // Aur local data ko state mein set karte hain
       updatePortfolio('profilePicDataUrl', reader.result);
     };
+    
+    // Hum file ko upload karne ki koshish bhi karte hain
     const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}/${file.name}`);
     try {
       await uploadBytes(storageRef, file);
       const downloadURL = await getDownloadURL(storageRef);
       updatePortfolio('profilePicUrl', downloadURL);
-      // --- FIX: Clear the local data URL after a successful upload ---
-      // This ensures the final `profilePicUrl` is the source of truth
-      updatePortfolio('profilePicDataUrl', '');
+      
+      // --- YAHI HAI PERMANENT FIX ---
+      // Hum is line ko hata denge (ya comment kar denge)
+      // updatePortfolio('profilePicDataUrl', ''); // <-- IS LINE KO HATA DIYA GAYA
+      // --- END OF FIX ---
+
       toast.success("Profile picture updated!");
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -199,7 +208,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
       return;
     }
     const updater = (prevSection) => {
-      const newSection = { ...(prevSection || { items: [], showOnPage: false }) };
+      const newSection = { ...(prevSection || { items: [], showOnPage: false, showOnResume: false }) };
       const wasEmpty = (newSection.items || []).length === 0;
       if (editingIndex.field === field && editingIndex.index !== null) {
         newSection.items = (newSection.items || []).map((item, index) =>
@@ -427,7 +436,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <input type="text" placeholder="Percentage" value={portfolioData.education?.class12?.percentage || ''} onChange={e => updatePortfolio('education.class12.percentage', e.target.value)} />
         <input type="text" placeholder="Passing Year" value={portfolioData.education?.class12?.passingYear || ''} onChange={e => updatePortfolio('education.class12.passingYear', e.target.value)} />
         <ToggleSwitch label="Show" checked={portfolioData.education?.class12?.showOnPage || false} onChange={() => updatePortfolio('education.class12.showOnPage', !portfolioData.education?.class12?.showOnPage)} />
-        <h4 style={{ marginTop: '1rem' }}>Class X</h4>
+        <h4 style={{ marginTop: '1frem' }}>Class X</h4>
         <input type="text" placeholder="School Name" value={portfolioData.education?.class10?.school || ''} onChange={e => updatePortfolio('education.class10.school', e.target.value)} />
         <input type="text" placeholder="Board (e.g., CBSE, ICSE)" value={portfolioData.education?.class10?.board || ''} onChange={e => updatePortfolio('education.class10.board', e.target.value)} />
         <input type="text" placeholder="Percentage" value={portfolioData.education?.class10?.percentage || ''} onChange={e => updatePortfolio('education.class10.percentage', e.target.value)} />
@@ -450,9 +459,14 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
           {(portfolioData.certifications?.items || []).map((cert, index) => (<div key={index} className="list-item"><span>{cert.name}</span><div className="item-actions"><button onClick={() => handleEditItem('certifications', index)} className="edit-btn">Edit</button><button className="remove-btn" onClick={() => handleRemoveItem('certifications', index)}>X</button></div></div>))}
         </div>
       </details>
+      
+      {/* --- FIX IS HERE: BLOG POSTS SECTION --- */}
       <details id="blogPosts-section" className="controls-section">
         <summary><h3>Blog Posts</h3></summary>
-        <ToggleSwitch label="Show on page" checked={portfolioData.blogPosts?.showOnPage || false} onChange={() => updatePortfolio('blogPosts.showOnPage', !portfolioData.blogPosts?.showOnPage)} />
+        <div className="toggle-group">
+          <ToggleSwitch label="Show on page" checked={portfolioData.blogPosts?.showOnPage || false} onChange={() => updatePortfolio('blogPosts.showOnPage', !portfolioData.blogPosts?.showOnPage)} />
+          <ToggleSwitch label="Show on resume" checked={portfolioData.blogPosts?.showOnResume || false} onChange={() => updatePortfolio('blogPosts.showOnResume', !portfolioData.blogPosts?.showOnResume)} />
+        </div>
         <hr style={{ margin: '1rem 0' }} />
         <h4>{editingIndex.field === 'blogPosts' ? 'Edit Blog Post' : 'Add New Post'}</h4>
         <input type="text" placeholder="New Post Title" value={newBlogPost.title} onChange={e => setNewBlogPost(p => ({ ...p, title: e.target.value }))} />
@@ -475,21 +489,36 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
           ))}
         </div>
       </details>
+      
+      {/* --- FIX IS HERE: CUSTOM SECTION --- */}
       <details id="customSections-section" className="controls-section">
         <summary><h3>Custom Section</h3></summary>
         <label>Section Title</label>
         <input type="text" placeholder="Custom Section Title" value={portfolioData.customSections?.title || ''} onChange={e => updatePortfolio('customSections.title', e.target.value)} />
-        <ToggleSwitch
-          label="Show on page"
-          checked={portfolioData.customSections?.showOnPage || false}
-          onChange={() => {
-            const updater = (prevSection) => ({
-              ...(prevSection || { title: 'Custom Section', items: [] }),
-              showOnPage: !prevSection?.showOnPage
-            });
-            updatePortfolio('customSections', updater);
-          }}
-        />
+        <div className="toggle-group">
+          <ToggleSwitch
+            label="Show on page"
+            checked={portfolioData.customSections?.showOnPage || false}
+            onChange={() => {
+              const updater = (prevSection) => ({
+                ...(prevSection || { title: 'Custom Section', items: [], showOnPage: false, showOnResume: false }),
+                showOnPage: !prevSection?.showOnPage
+              });
+              updatePortfolio('customSections', updater);
+            }}
+          />
+          <ToggleSwitch
+            label="Show on resume"
+            checked={portfolioData.customSections?.showOnResume || false}
+            onChange={() => {
+              const updater = (prevSection) => ({
+                ...(prevSection || { title: 'Custom Section', items: [], showOnPage: false, showOnResume: false }),
+                showOnResume: !prevSection?.showOnResume
+              });
+              updatePortfolio('customSections', updater);
+            }}
+          />
+        </div>
         <hr style={{ margin: '1rem 0' }} />
         <h4>{editingIndex.field === 'customSections' ? 'Edit Item' : 'Add New Item'}</h4>
         <input type="text" placeholder="Item Title" value={newCustomItem.title} onChange={e => setNewCustomItem(p => ({ ...p, title: e.target.value }))} />
@@ -512,6 +541,8 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
           ))}
         </div>
       </details>
+      {/* --- END OF FIX --- */}
+
       <details className="controls-section">
         <summary><h3>Theme & Design</h3></summary>
         <label>Layout Template</label>
