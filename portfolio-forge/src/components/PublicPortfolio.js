@@ -44,12 +44,15 @@ function PublicPortfolio() {
       setLoading(false);
       return;
     }
-    const docRef = doc(db, "portfolios", userId);
+    
+    const versionToShow = versionId || 'default';
+    const docRef = doc(db, "portfolios", userId, "versions", versionToShow);
+
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        const fullData = docSnap.data();
-        const versionToShow = versionId || fullData.meta?.activeVersion || 'default';
-        setPortfolioData(fullData.portfolios[versionToShow]);
+        setPortfolioData(docSnap.data());
+      } else {
+        setPortfolioData(null);
       }
       setLoading(false);
     });
@@ -75,7 +78,6 @@ function PublicPortfolio() {
     userName, 
     userSubtitle, 
     profilePicUrl, 
-    // --- FIX 1: Get the profilePicDataUrl ---
     profilePicDataUrl,
     bio, 
     location,
@@ -92,7 +94,6 @@ function PublicPortfolio() {
     customSections = { title: 'Custom Section', showOnPage: false, items: [] } 
   } = portfolioData;
   
-  // --- FIX 2: Prioritize the saved data URL, just like in Resume.js ---
   const imageToDisplay = profilePicDataUrl || profilePicUrl;
 
   const layoutClass = theme.layout === 'compact' ? 'layout-compact' : 'layout-standard';
@@ -104,7 +105,6 @@ function PublicPortfolio() {
     <div className={`public-portfolio-container ${layoutClass}`} style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}>
       <header className="hero-public">
         <div className="hero-main-content">
-          {/* --- FIX 3: Use the 'imageToDisplay' variable --- */}
           {imageToDisplay && <img src={imageToDisplay} alt="Profile" className="profile-pic-public" style={{ borderColor: theme.accentColor }}/>}
           <div className="hero-text">
             <h1>{userName}</h1>

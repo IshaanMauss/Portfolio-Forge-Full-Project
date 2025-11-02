@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { auth, storage, db } from '../firebase/config';
-// --- YEH IMPORT ZAROORI HAI ---
 import { getIdTokenResult } from 'firebase/auth';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-toastify';
+
+// --- FIX: IMPORT THE COMPRESSION LIBRARY ---
+import imageCompression from 'browser-image-compression'; 
+
 import { getEnhancedText } from '../api/enhanceAPI';
 import { getEnhancedDescription } from '../api/mockEnhanceAPI';
 import ToggleSwitch from './ToggleSwitch';
 import FeedbackViewer from './FeedbackViewer';
 
 function ControlPanel({ portfolioData, updatePortfolio }) {
-  // Baaki saare state waise hi rahenge
   const [newProject, setNewProject] = useState({ title: '', keywords: '', description: '', githubUrl: '', liveUrl: '' });
   const [newHardSkill, setNewHardSkill] = useState('');
   const [newSoftSkill, setNewSoftSkill] = useState('');
@@ -26,21 +28,17 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
   const [activeSuggestionField, setActiveSuggestionField] = useState(null);
   const [feedbackList, setFeedbackList] = useState([]);
   const [feedbackLoading, setFeedbackLoading] = useState(true);
-  
-  // --- YEH NAYA STATE HAI ---
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // --- PEHLA useEffect: Sirf Admin status check karne ke liye ---
+  // useEffect for admin check (No Change)
   useEffect(() => {
     const checkAdminStatus = async () => {
       const currentUser = auth.currentUser;
       if (currentUser) {
         try {
-          // User ka token force refresh karke fetch karo taaki naya claim mile
           const idTokenResult = await getIdTokenResult(currentUser, true);
-          // Token ke 'claims' se check karo ki admin tag hai ya nahi
           if (idTokenResult.claims.admin) {
-            setIsAdmin(true); // User admin hai!
+            setIsAdmin(true);
           } else {
             setIsAdmin(false);
           }
@@ -51,7 +49,6 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
       }
     };
     
-    // Jab bhi user login ya logout kare, status check karo
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         checkAdminStatus();
@@ -61,10 +58,9 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
     });
 
     return () => unsubscribe();
-  }, []); // Yeh component load hone par ek baar chalega
+  }, []);
 
-  // --- DOOSRA useEffect: Sirf feedback data laane ke liye ---
-  // Yeh tabhi chalega jab 'isAdmin' state 'true' ho jaega
+  // useEffect for feedback (No Change)
   useEffect(() => {
     if (isAdmin) {
       setFeedbackLoading(true);
@@ -83,54 +79,71 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         setFeedbackLoading(false);
       });
       
-      // Cleanup function
       return () => unsubscribe();
     } else {
-      // Agar user admin nahi hai, toh feedback list ko khaali kardo
       setFeedbackList([]);
       setFeedbackLoading(false);
     }
-  }, [isAdmin]); // Yeh effect 'isAdmin' state par depend karta hai
+  }, [isAdmin]);
 
   
+  // --- THIS FUNCTION IS REBUILT WITH COMPRESSION ---
   const handleProfilePicUpload = async (e) => {
-    // ... baaki saara function code waisa hi rahega ...
     const file = e.target.files[0];
     if (!file || !auth.currentUser) return;
+    
     setIsUploading(true);
-    
-    // --- YEH "SMART METHOD" HAI ---
-    // Hum file ko hamesha local data URL (base64) mein convert karte hain
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-      // Aur local data ko state mein set karte hain
-      updatePortfolio('profilePicDataUrl', reader.result);
-    };
-    
-    // Hum file ko upload karne ki koshish bhi karte hain
-    const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}/${file.name}`);
-    try {
-      await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(storageRef);
-      updatePortfolio('profilePicUrl', downloadURL);
-      
-      // --- YAHI HAI PERMANENT FIX ---
-      // Hum is line ko hata denge (ya comment kar denge)
-      // updatePortfolio('profilePicDataUrl', ''); // <-- IS LINE KO HATA DIYA GAYA
-      // --- END OF FIX ---
+    toast.info("Compressing image...", { autoClose: 2000 });
 
-      toast.success("Profile picture updated!");
+    try {
+      // --- START OF COMPRESSION LOGIC ---
+      const options = {
+        maxSizeMB: 0.2, // Compress to 200KB. This is the magic.
+        maxWidthOrHeight: 800, // Resize to 800px max
+        useWebWorker: true,
+      };
+      
+      const compressedFile = await imageCompression(file, options);
+      // --- END OF COMPRESSION LOGIC ---
+
+
+      // Step 1: Read the *compressed* file as a Data URL
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(compressedFile); // Use the compressed file
+      });
+
+      // Step 2: Update state with the *small* Data URL for instant preview
+      updatePortfolio('profilePicDataUrl', dataUrl);
+      
+      // Step 3: Upload the *compressed* file to Storage
+      const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}/${compressedFile.name}`);
+      await uploadBytes(storageRef, compressedFile); // Use the compressed file
+      
+      // Step 4: Get the permanent Storage URL
+      const downloadURL = await getDownloadURL(storageRef);
+
+      // Step 5: Update state with the permanent URL
+      updatePortfolio('profilePicUrl', downloadURL);
+
+      // Step 6: Tell the user to save
+      toast.success("Preview updated! Click 'Save' in the top bar to confirm.");
+    
     } catch (error) {
-      console.error("Error uploading file:", error);
+      console.error("Error compressing or uploading file:", error);
       toast.error("Failed to upload profile picture.");
+      updatePortfolio('profilePicDataUrl', '');
+    
     } finally {
       setIsUploading(false);
     }
   };
+  // --- END OF FIX ---
 
+  // handleExportFeedback (No Change)
   const handleExportFeedback = () => {
-    // ... baaki saara function code waisa hi rahega ...
     if (feedbackList.length === 0) {
       toast.warn("No feedback to export.");
       return;
@@ -181,6 +194,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
     return <aside className="controls-panel">Loading controls...</aside>;
   }
 
+  // All other functions (handleEditItem, cancelEdit, etc.) are unchanged
   const handleEditItem = (field, index) => {
     const itemToEdit = portfolioData[field].items[index];
     const sectionElement = document.getElementById(`${field}-section`);
@@ -293,13 +307,13 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
     handleAddTag(field, suggestion, resetter);
   };
 
+  // The entire return (JSX) section is unchanged
   return (
     <aside className="controls-panel">
       <details className="controls-section" open>
         <summary><h3>Profile & Contact</h3></summary>
         <label>Profile Picture</label>
         <div className="profile-pic-area">
-          {/* --- FIX: Prioritize local data URL for instant preview --- */}
           {(portfolioData.profilePicDataUrl || portfolioData.profilePicUrl) && (
             <img 
               src={portfolioData.profilePicDataUrl || portfolioData.profilePicUrl} 
@@ -309,7 +323,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
           )}
           <input type="file" id="file-upload" accept="image/*" onChange={handleProfilePicUpload} disabled={isUploading} />
           <label htmlFor="file-upload" className="custom-file-upload">Choose File</label>
-          {isUploading && <p>Uploading...</p>}
+          {isUploading && <p>Compressing & Uploading...</p>}
         </div>
         <label>Full Name</label>
         <input type="text" value={portfolioData.userName || ''} onChange={e => updatePortfolio('userName', e.target.value)} />
@@ -447,7 +461,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <summary><h3>Certifications</h3></summary>
         <ToggleSwitch label="Show on page" checked={portfolioData.certifications?.showOnPage !== false} onChange={() => updatePortfolio('certifications.showOnPage', !portfolioData.certifications?.showOnPage)} />
         <h4>{editingIndex.field === 'certifications' ? 'Edit Certification' : 'Add New Certification'}</h4>
-        <input type="text" placeholder="Certification Name" value={newCertification.name} onChange={e => setNewCertification({ ...newCertification, name: e.target.value })} />
+        <input type="text" placeholder="Certification Name" value={newCertification.name} onChange={e => setNewCertification({ ...newCertification, name: e.targe.value })} />
         <input type="text" placeholder="Issuing Organization" value={newCertification.issuer} onChange={e => setNewCertification({ ...newCertification, issuer: e.target.value })} />
         <div className="form-actions">
           {editingIndex.field === 'certifications' && <button className="cancel-btn" onClick={cancelEdit}>Cancel</button>}
@@ -460,7 +474,6 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         </div>
       </details>
       
-      {/* --- FIX IS HERE: BLOG POSTS SECTION --- */}
       <details id="blogPosts-section" className="controls-section">
         <summary><h3>Blog Posts</h3></summary>
         <div className="toggle-group">
@@ -490,7 +503,6 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         </div>
       </details>
       
-      {/* --- FIX IS HERE: CUSTOM SECTION --- */}
       <details id="customSections-section" className="controls-section">
         <summary><h3>Custom Section</h3></summary>
         <label>Section Title</label>
@@ -541,7 +553,6 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
           ))}
         </div>
       </details>
-      {/* --- END OF FIX --- */}
 
       <details className="controls-section">
         <summary><h3>Theme & Design</h3></summary>
