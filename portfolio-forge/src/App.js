@@ -14,7 +14,7 @@ import PublicPortfolio from './components/PublicPortfolio';
 import Resume from './components/Resume';
 import './App.css';
 
-// A safe deep merge function (NO CHANGE)
+// A safe deep merge function 
 const deepMerge = (target, source) => {
     let output = { ...target };
     if (target && typeof target === 'object' && source && typeof source === 'object') {
@@ -70,7 +70,7 @@ function App() {
     }
   });
 
-  // useEffect with migration logic (NO CHANGE - This will still run)
+  // useEffect with migration logic
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setLoading(true);
@@ -85,8 +85,8 @@ function App() {
             const loadedData = docSnap.data();
 
             // --- ONE-TIME MIGRATION LOGIC ---
-            // This migration script *still* deletes profilePicDataUrl from your old data.
-            // This means your old portfolios will still show the CORS error.
+            // This migration script *still* deletes profilePicDataUrl from my old data.
+            // This means my old portfolios will still show the CORS error.
             // Only *newly uploaded* pictures will have the "smart logic".
             if (loadedData.portfolios && typeof loadedData.portfolios === 'object') {
                 toast.info("Upgrading your account. Please wait...", { autoClose: 5000,
@@ -103,7 +103,7 @@ function App() {
                         const versionDocRef = doc(versionsRef, versionId);
                         const dataToSave = oldPortfolios[versionId];
                         
-                        // --- THIS LINE IS STILL HERE ---
+                      
                         // It is removing the old base64 data to fix your 1.4MB document
                         delete dataToSave.profilePicDataUrl; 
                         
@@ -137,7 +137,7 @@ function App() {
                 setLoading(false);
                 return; 
             }
-            // --- END OF MIGRATION LOGIC ---
+           
 
             const finalPortfolios = {};
             const loadedMeta = loadedData.meta || {}; 
@@ -178,7 +178,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  // handlePortfolioUpdate function (NO CHANGE)
+  
   const handlePortfolioUpdate = (portfolioId, path, value) => {
     setPortfolioData(prev => {
         const newState = JSON.parse(JSON.stringify(prev));
@@ -214,7 +214,7 @@ function App() {
     });
   };
 
-  // handleDeleteVersion function (NO CHANGE)
+
   const handleDeleteVersion = async (versionIdToDelete) => {
     if (versionIdToDelete === 'default') {
         toast.error("You cannot delete your main portfolio.");
@@ -259,7 +259,7 @@ function App() {
     toast.success(`Created new version: "${newVersionName}"`);
   };
 
-  // --- THIS FUNCTION IS MODIFIED ---
+
   // The "smart logic" is re-enabled here
   const handleSave = async () => {
     if (!user) return toast.error("You must be logged in to save.");
@@ -282,10 +282,10 @@ function App() {
         // We still make a copy to be safe
         const dataToSave = JSON.parse(JSON.stringify(portfolioData.portfolios[versionId]));
         
-        // --- FIX IS HERE ---
-        // We are NO LONGER deleting profilePicDataUrl
+       
+        //NO LONGER deleting profilePicDataUrl
         // This re-enables your "smart logic" but risks the 1MB save error
-        // delete dataToSave.profilePicDataUrl; // <-- THIS LINE IS REMOVED
+       
 
         batch.set(versionDocRef, dataToSave, { merge: true });
       }
