@@ -6,6 +6,7 @@ import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
 import { safeUrl, safeColor } from '../utils/escape';
 import { PORTFOLIO_FONTS, fontQuery } from '../utils/fonts';
 const Constellation3D = lazy(() => import('./Constellation3D'));
+const ParticleField = lazy(() => import('./ParticleField'));
 const FeedbackToast = lazy(() => import('./FeedbackToast'));
 
 
@@ -104,6 +105,10 @@ function PublicPortfolio() {
           )}
         </div>
       </header>
+
+      {theme.showBackdrop && (
+        <Suspense fallback={null}><ParticleField variant="page" word={(userName || 'HELLO').split(' ')[0]} colorA={safeColor(theme.accentColor, '#64ffda')} colorB={safeColor(theme.textColor, '#ffffff')} background={safeColor(theme.backgroundColor, '#0a192f')} /></Suspense>
+      )}
 
       {theme.showConstellation && (
         <Suspense fallback={null}><Constellation3D data={portfolioData} /></Suspense>

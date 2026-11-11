@@ -360,6 +360,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
             </button>
           ))}
         </div>
+        <ToggleSwitch label="Living 3D particle backdrop (morphs as visitors scroll)" checked={portfolioData.theme?.showBackdrop || false} onChange={() => updatePortfolio('theme.showBackdrop', !portfolioData.theme?.showBackdrop)} />
         <ToggleSwitch label="3D constellation on my public page" checked={portfolioData.theme?.showConstellation || false} onChange={() => updatePortfolio('theme.showConstellation', !portfolioData.theme?.showConstellation)} />
         <label>Font</label>
         <select value={portfolioData.theme?.font || 'Poppins'} onChange={e => updatePortfolio('theme.font', e.target.value)}>

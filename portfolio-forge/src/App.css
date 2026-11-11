@@ -60,7 +60,9 @@
 .hero-copy .hero-note { font-size: 0.9rem; }
 .hero-visual { position: relative; min-height: 440px; }
 .hero3d { position: absolute; inset: 0; }
-.hero3d canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; }
+.pf-backdrop { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.pf-backdrop canvas { display: block; width: 100%; height: 100%; }
+.hero3d canvas { cursor: pointer; display: block; width: 100%; height: 100%; touch-action: pan-y; }
 .login-container .feature-grid { margin: 3rem auto 0; }
 .rise { opacity: 0; transform: translateY(18px); animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; animation-delay: var(--d, 0ms); }
 @keyframes rise { to { opacity: 1; transform: none; } }
@@ -184,7 +186,7 @@
   --pf-soft: color-mix(in srgb, currentColor 7%, transparent);
   --pf-soft-2: color-mix(in srgb, currentColor 11%, transparent);
   --pf-line: color-mix(in srgb, currentColor 22%, transparent);
-  max-width: 1000px; margin: 0 auto; padding: 4rem 2rem; min-height: 100dvh; line-height: 1.7;
+  max-width: 1000px; margin: 0 auto; padding: 4rem 2rem; min-height: 100dvh; line-height: 1.7; position: relative; z-index: 1;
 }
 .public-portfolio-container a { color: var(--pf-accent); }
 .hero-public { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 2rem; margin-bottom: 3rem; text-align: left; }
