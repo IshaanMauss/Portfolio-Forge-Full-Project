@@ -2,7 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { auth } from '../firebase/config';
 import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
-import { safeUrl } from '../utils/escape';
+import { safeUrl, safeColor } from '../utils/escape';
+
+const FONT_CSS = {
+  Poppins: 'Poppins:wght@400;600;700',
+  'Roboto Slab': 'Roboto+Slab:wght@400;700',
+  Lato: 'Lato:wght@400;700',
+};
 
 function PublicPortfolio() {
   const { userId, versionId } = useParams();
@@ -33,13 +39,22 @@ function PublicPortfolio() {
   // --- THE FIX: Check if there's at least one link to show the contact section ---
   const showContactSection = links?.email || links?.linkedin || links?.github;
 
+  const font = FONT_CSS[theme.font] ? theme.font : 'Poppins';
+  const containerStyle = {
+    backgroundColor: safeColor(theme.backgroundColor, '#0a192f'),
+    color: safeColor(theme.textColor, '#ccd6f6'),
+    fontFamily: `'${font}', system-ui, sans-serif`,
+    '--pf-accent': safeColor(theme.accentColor, '#64ffda'),
+  };
+
   return (
-    <div className={`public-portfolio-container ${layoutClass}`} style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}>
+    <div className={`public-portfolio-container ${layoutClass}`} style={containerStyle}>
       <title>{`${userName || 'Portfolio'}${userSubtitle ? ' – ' + userSubtitle : ''}`}</title>
       <meta name="description" content={(bio || '').slice(0, 160)} />
       <meta property="og:title" content={`${userName || 'Portfolio'}${userSubtitle ? ' – ' + userSubtitle : ''}`} />
       <meta property="og:description" content={(bio || '').slice(0, 160)} />
       <meta property="og:type" content="profile" />
+      <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${FONT_CSS[font]}&display=swap`} precedence="default" />
       <header className="hero-public">
         <div className="hero-main-content">
           {profilePicUrl && <img src={profilePicUrl} alt="Profile" className="profile-pic-public" style={{ borderColor: theme.accentColor }}/>}
@@ -111,6 +126,9 @@ function PublicPortfolio() {
           )}
         </aside>
       </div>
+      <footer className="pf-badge">
+        <a href="/">Built with Portfolio Forge — create yours free</a>
+      </footer>
     </div>
   );
 }

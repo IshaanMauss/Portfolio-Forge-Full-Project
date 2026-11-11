@@ -9,6 +9,7 @@ import Navbar from './components/Navbar';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import { publishAll, hasPublished } from './utils/publish';
+import { normalizeData } from './utils/normalize';
 import './App.css';
 
 // Public pages are code-split so the editor bundle stays small and the
@@ -101,8 +102,10 @@ function App() {
       const docRef = doc(db, 'portfolios', currentUser.uid);
       const docSnap = await getDoc(docRef);
       const defaultData = createDefaultData(currentUser);
-      const merged = docSnap.exists() ? deepMerge(defaultData, docSnap.data()) : defaultData;
-      const active = merged.meta.activeVersion || 'default';
+      const rawMerged = docSnap.exists() ? deepMerge(defaultData, docSnap.data()) : defaultData;
+      const rawActive = rawMerged.meta.activeVersion || 'default';
+      const merged = normalizeData(rawMerged);
+      const active = merged.meta.activeVersion;
 
       // One-time migration: make sure a public copy exists for existing users.
       let alreadyPublished = true;
@@ -112,7 +115,8 @@ function App() {
       }
 
       const snap = snapshotOf(merged, active);
-      lastDraftSnapshot.current = snap;
+      // Compare against the RAW data so a repaired document is autosaved.
+      lastDraftSnapshot.current = snapshotOf(rawMerged, rawActive);
       lastPublishedSnapshot.current = docSnap.exists() ? snap : null;
       setUnpublished(!docSnap.exists());
       setPortfolioData(merged);
@@ -175,6 +179,11 @@ function App() {
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   }, []);
+
+  // Safety net: never point the editor at a version that has no data.
+  useEffect(() => {
+    if (portfolioData && !portfolioData.portfolios?.[activePortfolio]) setActivePortfolio('default');
+  }, [portfolioData, activePortfolio]);
 
   const handlePortfolioUpdate = (path, value) => {
     setPortfolioData(prev => {
@@ -253,7 +262,7 @@ function App() {
                   </div>
                 ) : (
                   <Dashboard
-                    portfolioData={portfolioData?.portfolios[activePortfolio]}
+                    portfolioData={portfolioData?.portfolios?.[activePortfolio]}
                     updatePortfolio={handlePortfolioUpdate}
                   />
                 )

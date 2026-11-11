@@ -1,0 +1,64 @@
+/* Design tokens. Three app palettes, switched with <html data-theme="...">.
+   Orchid (default): pastel orchid + deep eggplant + signal orange, sage-gray neutrals.
+   Sage:             muted sage gray + warm cream + deep burgundy (light).
+   Forest:           charcoal black + forest green + crimson. */
+:root,
+:root[data-theme='orchid'] {
+  color-scheme: dark;
+  --bg: #1f1029;
+  --surface: #2b1639;
+  --surface-2: #381f4a;
+  --border: #4b3262;
+  --text: #f6ecf5;
+  --muted: #b8a6c6;
+  --primary: #e9b6da;
+  --on-primary: #2b1338;
+  --cta: #ff6a2b;
+  --on-cta: #1f1029;
+  --link: #f0c4e3;
+  --sage: #b5bfb0;
+  --danger: #ff5d73;
+  --on-danger: #1f1029;
+}
+:root[data-theme='sage'] {
+  color-scheme: light;
+  --bg: #f4ede0;
+  --surface: #fbf7ef;
+  --surface-2: #ece4d3;
+  --border: #d6ccb8;
+  --text: #2b2a26;
+  --muted: #6a6f63;
+  --primary: #6d1f2e;
+  --on-primary: #fbf3e8;
+  --cta: #6d1f2e;
+  --on-cta: #fbf3e8;
+  --link: #6d1f2e;
+  --sage: #a9b3a4;
+  --danger: #b3261e;
+  --on-danger: #ffffff;
+}
+:root[data-theme='forest'] {
+  color-scheme: dark;
+  --bg: #151718;
+  --surface: #1e2224;
+  --surface-2: #272d2f;
+  --border: #353d40;
+  --text: #e8efea;
+  --muted: #99a69f;
+  --primary: #3fa877;
+  --on-primary: #0d1a13;
+  --cta: #d7263d;
+  --on-cta: #ffffff;
+  --link: #6fd3a3;
+  --sage: #8fa398;
+  --danger: #ff6b6b;
+  --on-danger: #151718;
+}
+:root {
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --radius-sm: 10px;
+  --radius: 14px;
+  --shadow: 0 10px 30px -12px rgba(0, 0, 0, 0.45);
+  --nav-h: 64px;
+  --tabs-h: 48px;
+}

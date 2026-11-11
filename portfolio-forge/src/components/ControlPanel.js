@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { getEnhancedText } from '../api/enhanceAPI';
 import { getEnhancedDescription } from '../api/suggestions';
 import ToggleSwitch from './ToggleSwitch';
+import { PORTFOLIO_PALETTES } from '../utils/palettes';
 
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
@@ -295,6 +296,24 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
 
       <details className="controls-section">
         <summary><h3>Theme & Design</h3></summary>
+        <label>Colour presets</label>
+        <div className="palette-presets">
+          {PORTFOLIO_PALETTES.map(p => (
+            <button
+              key={p.id}
+              type="button"
+              className="palette-chip"
+              onClick={() => {
+                updatePortfolio('theme.backgroundColor', p.backgroundColor);
+                updatePortfolio('theme.textColor', p.textColor);
+                updatePortfolio('theme.accentColor', p.accentColor);
+              }}
+            >
+              <span className="palette-swatch" style={{ background: `linear-gradient(135deg, ${p.backgroundColor} 50%, ${p.accentColor} 50%)` }} />
+              {p.name}
+            </button>
+          ))}
+        </div>
         <label>Layout Template</label>
         <select value={portfolioData.theme?.layout || 'standard'} onChange={e => updatePortfolio('theme.layout', e.target.value)}>
           <option value="standard">Standard (Two-Column)</option>
