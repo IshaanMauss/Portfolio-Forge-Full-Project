@@ -9,26 +9,36 @@ service cloud.firestore {
     // PRIVATE: the editable draft (all versions, hidden fields, address, etc.).
     // Only the owner can ever read or write it.
     match /portfolios/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId) && request.resource.data.keys().size() <= 40;
     }
 
     // PRIVATE: the job-application tracker. One small document per user; the size is also capped
     // by the client (200 entries). Never public.
     match /tracker/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId)
+                   && request.resource.data.keys().hasOnly(['jobs'])
+                   && request.resource.data.jobs is list
+                   && request.resource.data.jobs.size() <= 200;
     }
 
     // PUBLIC: sanitized copies written by the owner on "Save & Publish".
     // Anyone may read (that is what makes /p/:uid and /resume/:uid work for
     // logged-out visitors); only the owner may write. Hidden sections, the
     // address and version names/goals are stripped before publishing.
+    // Public pages are fetched by exact id (get). Listing is owner-only, so nobody can
+    // enumerate every published portfolio or user id.
     match /published/{userId} {
-      allow read: if true;
-      allow write: if isOwner(userId);
+      allow get: if true;
+      allow list: if false;
+      allow write: if isOwner(userId)
+                   && request.resource.data.keys().hasOnly(['activeVersion', 'updatedAt']);
 
       match /versions/{versionId} {
-        allow read: if true;
-        allow write: if isOwner(userId);
+        allow get: if true;
+        allow list: if isOwner(userId);
+        allow write: if isOwner(userId) && request.resource.data.keys().size() <= 40;
       }
     }
 

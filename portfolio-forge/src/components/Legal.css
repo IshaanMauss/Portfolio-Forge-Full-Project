@@ -17,3 +17,10 @@
 .account-danger { border-color: color-mix(in srgb, var(--danger) 60%, var(--border)); }
 .account-danger input { max-width: 260px; }
 .pe-btn.danger { background: var(--danger); color: var(--on-danger); border-color: transparent; }
+
+/* Small screens: tables scroll instead of squashing the page */
+.legal-page table { display: block; overflow-x: auto; max-width: 100%; }
+@media (max-width: 600px) {
+  .legal-page { padding-left: 1rem; padding-right: 1rem; }
+  .legal-page th, .legal-page td { min-width: 9rem; }
+}

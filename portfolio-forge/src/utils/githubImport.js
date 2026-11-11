@@ -14,22 +14,45 @@ export class GitHubError extends Error {
   constructor(code, message) { super(message); this.code = code; }
 }
 
+// Repository text lives only in this tab's memory. It is never written to localStorage, Firestore or
+// any server of ours, and it disappears when the tab is closed. The Map also saves GitHub's 60/hour
+// anonymous quota when the same repository is analysed twice.
+const memo = new Map();
+export const FULLNAME_RE = /^[A-Za-z\d][\w.-]{0,99}\/[\w.-]{1,100}$/;
+export const clearImportMemory = () => memo.clear();
+const SAFE_HTTP = /^https?:\/\/[^\s<>"']+$/i;
+export const safeHttpUrl = (u) => (SAFE_HTTP.test(String(u || '')) ? String(u) : '');
+
 async function gh(path, { raw = false, optional = false } = {}) {
-  const res = await fetch(`${API}${path}`, {
-    headers: { Accept: raw ? 'application/vnd.github.raw+json' : 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
-  });
+  const key = `${raw ? 'r' : 'j'}:${path}`;
+  if (memo.has(key)) return memo.get(key);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
+  let res;
+  try {
+    res = await fetch(`${API}${path}`, {
+      headers: { Accept: raw ? 'application/vnd.github.raw+json' : 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+      credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store', signal: ctrl.signal,
+    });
+  } catch (e) {
+    throw new GitHubError('network', 'Could not reach GitHub. Check your connection and try again.');
+  } finally {
+    clearTimeout(timer);
+  }
   if (res.status === 404 && optional) return null;
   if (res.status === 404) throw new GitHubError('notfound', 'GitHub user or repository not found.');
   if (res.status === 403 || res.status === 429) throw new GitHubError('rate', 'GitHub is limiting requests from your network right now. Please try again in a few minutes.');
   if (!res.ok) throw new GitHubError('http', `GitHub returned an error (${res.status}).`);
-  return raw ? res.text() : res.json();
+  const out = raw ? (await res.text()).slice(0, 60000) : await res.json();
+  memo.set(key, out);
+  return out;
 }
 
 const slim = (r) => ({
   name: r.name, fullName: r.full_name, owner: r.owner?.login || '', description: r.description || '',
   language: r.language || '', topics: Array.isArray(r.topics) ? r.topics.slice(0, 12) : [],
   stars: r.stargazers_count || 0, forks: r.forks_count || 0, fork: !!r.fork, archived: !!r.archived,
-  homepage: r.homepage || '', htmlUrl: r.html_url, updatedAt: r.pushed_at || r.updated_at, hasLicense: !!r.license,
+  homepage: safeHttpUrl(r.homepage), htmlUrl: safeHttpUrl(r.html_url), updatedAt: r.pushed_at || r.updated_at, hasLicense: !!r.license,
 });
 
 export async function listRepos(username) {
@@ -40,6 +63,7 @@ export async function listRepos(username) {
 }
 
 export async function analyseRepo(repo) {
+  if (!FULLNAME_RE.test(String(repo.fullName || ''))) throw new GitHubError('invalid', 'Unexpected repository name.');
   const base = `/repos/${repo.fullName}`;
   const [readmeRaw, contents, languages] = await Promise.all([
     gh(`${base}/readme`, { raw: true, optional: true }),
@@ -182,6 +206,6 @@ export function toProjectItem(analysis, bullets, liveUrl) {
     keywords: tech.filter((t) => !t.test).map((t) => t.name).slice(0, 8).join(', '),
     description: bullets.map((b) => b.text).join(' ').slice(0, 900),
     githubUrl: repo.htmlUrl,
-    liveUrl: /^https?:\/\//i.test(liveUrl || '') ? liveUrl : '',
+    liveUrl: safeHttpUrl(liveUrl),
   };
 }

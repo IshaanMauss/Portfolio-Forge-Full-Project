@@ -33,6 +33,19 @@ Each draft bullet is one of two kinds, and the UI says which:
 The verb depends on your answer to "Your role" (Built / Developed / Contributed to). Forks and team
 projects show a lower **authorship** level and a note to describe your own contribution.
 
+## Data handling
+
+- Repository text is kept only in a JavaScript `Map` in the open tab and cleared when the import panel
+  closes. It is never written to localStorage, Firestore, Storage or our Worker.
+- Requests use `credentials: 'omit'`, `referrerPolicy: 'no-referrer'`, a 12 s timeout, and a 60 KB cap
+  per file. Repository names are validated against a strict pattern before building any API path.
+- Homepage and repository links are accepted only if they are plain `http(s)` URLs; `javascript:` and
+  similar are dropped. Public pages additionally pass every link through `safeUrl`.
+- A hostile README cannot take control of the app: it is stripped to plain text, rendered by React
+  (escaped), and never evaluated.
+- Someone else's repository: only public data is read, only the username you type is used, and nothing
+  is shared back to GitHub or the repository owner.
+
 ## Later (not built)
 
 Private repositories (read-only GitHub App with per-repository installation), commit-level contribution

@@ -45,6 +45,17 @@ function Privacy() {
         <li>We currently run no analytics and no advertising trackers.</li>
       </ul>
 
+      <h2>Cookies and local storage</h2>
+      <p>We set no tracking or advertising cookies today. Signing in uses Firebase Authentication, which keeps a sign-in token in your browser&apos;s storage so you stay logged in. We also keep your theme choice there. These are strictly necessary and are removed when you sign out or clear site data.</p>
+
+      <h2>Importing from GitHub or a resume PDF</h2>
+      <ul>
+        <li>The GitHub import reads <strong>public</strong> repositories only, straight from your browser to GitHub. We never ask for your GitHub password or a token and cannot see private repositories.</li>
+        <li>Repository text (README, file names, dependency lists) is held in your browser&apos;s memory while you review it and is discarded when you leave. We do not copy it to our servers. Only the project entries you choose to add are saved to your portfolio.</li>
+        <li>Repository text is treated as untrusted data. It is never run as code or sent to an AI model.</li>
+        <li>Resume PDFs you import are read inside your browser and never uploaded.</li>
+      </ul>
+
       <h2>Advertising</h2>
       <p>This is a free service and may show ads in the future, only on tool and content pages, never inside the editor. If ads are switched on, we will ask for your choice before any non-essential cookie is set, and you can change it later. Advertising partners may process data under their own privacy policies.</p>
 

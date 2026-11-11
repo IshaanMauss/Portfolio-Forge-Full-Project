@@ -27,3 +27,18 @@ Cloudflare, Google).
 3. Set a low billing budget with alerts if you use a paid plan.
 4. Keep `.env.local` out of git (already ignored).
 5. Run `npm audit` and keep dependencies updated.
+
+## Browser protections
+
+`firebase.json` sends `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, HSTS,
+`Cross-Origin-Opener-Policy` and a Content-Security-Policy that enforces `object-src 'none'`,
+`base-uri 'self'`, `frame-ancestors 'none'` and `form-action 'self'`. The full script/style/connect
+policy is sent as `Content-Security-Policy-Report-Only` first, so it can be checked in the browser
+console without breaking sign-in. After a clean pass, move its directives into the enforced header
+(for CRA builds also set `INLINE_RUNTIME_CHUNK=false` so no inline script is needed).
+
+## Data minimisation
+
+- Firestore public reads are by exact document id only; listing `published` is denied.
+- Writes are shape- and size-limited in `firestore.rules`; avatars are one fixed file per user (2 MB).
+- GitHub import data stays in browser memory only (see `docs/GITHUB_IMPORT.md`).

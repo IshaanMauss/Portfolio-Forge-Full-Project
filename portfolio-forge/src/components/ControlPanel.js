@@ -44,11 +44,11 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
       return;
     }
     setIsUploading(true);
-    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-    const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}/avatar-${Date.now()}.${ext}`);
+    const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}/avatar`);
     try {
-      await uploadBytes(storageRef, file, { contentType: file.type });
-      const downloadURL = await getDownloadURL(storageRef);
+      // One fixed file per user, replaced on each upload, so old pictures never pile up in storage.
+      await uploadBytes(storageRef, file, { contentType: file.type, cacheControl: 'public,max-age=3600' });
+      const downloadURL = `${await getDownloadURL(storageRef)}&v=${Date.now()}`;
       updatePortfolio('profilePicUrl', downloadURL);
       toast.success("Profile picture updated!");
     } catch (error) {

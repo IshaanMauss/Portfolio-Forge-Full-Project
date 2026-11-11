@@ -1,4 +1,4 @@
-import { firstParagraph, detectTech, buildAnalysis, generateBullets, toProjectItem, authorship, stripMarkdown, USERNAME_RE } from './githubImport';
+import { firstParagraph, detectTech, buildAnalysis, generateBullets, toProjectItem, authorship, stripMarkdown, USERNAME_RE, FULLNAME_RE, safeHttpUrl } from './githubImport';
 
 const repo = { name: 'realtime-chat-app', fullName: 'jane/realtime-chat-app', owner: 'jane', description: '', language: 'JavaScript', topics: ['chat'], stars: 3, forks: 0, fork: false, archived: false, homepage: 'https://chat.example.com', htmlUrl: 'https://github.com/jane/realtime-chat-app', hasLicense: true };
 const readme = `# Realtime Chat\n\n[![build](x.svg)](y)\n\nA real-time messaging application where friends can create rooms and talk instantly with typing indicators.\n\n## Installation\nnpm install\n`;
@@ -44,4 +44,13 @@ test('project item and untrusted text handling', () => {
 
 test('detectTech handles empty input', () => {
   expect(detectTech({ readme: '', files: [], languages: {} })).toEqual([]);
+});
+
+test('repository names and URLs are validated before use', () => {
+  expect(FULLNAME_RE.test('jane/chat-app')).toBe(true);
+  expect(FULLNAME_RE.test('jane/../../admin')).toBe(false);
+  expect(FULLNAME_RE.test('jane/app?x=1')).toBe(false);
+  expect(safeHttpUrl('https://example.com/a')).toBe('https://example.com/a');
+  expect(safeHttpUrl('javascript:alert(1)')).toBe('');
+  expect(safeHttpUrl('https://x.com/"onmouseover=1')).toBe('');
 });

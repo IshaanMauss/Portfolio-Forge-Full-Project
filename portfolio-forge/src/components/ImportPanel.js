@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import { extractPdf } from '../utils/pdfText';
 import { parseResume } from '../utils/resumeImport';
 import { resumeUpdates, projectUpdates } from '../utils/applyImport';
-import { listRepos, analyseRepo, generateBullets, toProjectItem, authorship, MAX_REPOS, GitHubError } from '../utils/githubImport';
+import { listRepos, analyseRepo, generateBullets, toProjectItem, authorship, MAX_REPOS, GitHubError, clearImportMemory } from '../utils/githubImport';
 
 const GROUPS = [
   ['name', 'Name'], ['headline', 'Tagline'], ['summary', 'Summary → Bio'], ['email', 'Email'], ['linkedin', 'LinkedIn'], ['github', 'GitHub'],
@@ -150,6 +150,8 @@ function GitHubTab({ portfolioData, updatePortfolio }) {
 
 function ImportPanel({ portfolioData, updatePortfolio }) {
   const [tab, setTab] = useState('github');
+  // Imported repository text is held in memory only; drop it when the panel goes away.
+  useEffect(() => clearImportMemory, []);
   return (
     <details className="controls-section">
       <summary><h3>Import (GitHub or resume PDF)</h3></summary>
