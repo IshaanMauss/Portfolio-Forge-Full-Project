@@ -1,6 +1,10 @@
 [
   {
-    "origin": ["*"],
+    "origin": [
+      "https://portfolio-forge-4e0a9.web.app",
+      "https://portfolio-forge-4e0a9.firebaseapp.com",
+      "http://localhost:3000"
+    ],
     "method": ["GET"],
     "maxAgeSeconds": 3600
   }

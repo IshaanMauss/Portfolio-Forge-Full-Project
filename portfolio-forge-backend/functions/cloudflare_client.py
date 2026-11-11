@@ -1,52 +1,59 @@
-# functions/cloudflare_client.py
+"""Thin client for Cloudflare Workers AI.
 
+Secrets are declared as SecretParams and read lazily (`.value`) at request
+time - they are only available at runtime, and the function must list them in
+`secrets=[...]` (see main.py).
+"""
+import logging
 import os
+
 import requests
-import firebase_admin
-from firebase_functions import params
+from firebase_functions.params import SecretParam
 
-# --- FINAL CORRECTED LOGIC ---
-# Initialization and secret loading is now global. This code runs only ONCE
-# when the function instance starts, preventing any "Duplicate Parameter" errors.
+CF_API_KEY = SecretParam("CF_API_KEY")
+CF_ACCOUNT_ID = SecretParam("CF_ACCOUNT_ID")
 
-# Initialize Firebase Admin SDK (safely)
-if not firebase_admin._apps:
-    firebase_admin.initialize_app()
+# Override with the CF_MODEL environment variable if you switch models.
+DEFAULT_MODEL = "@cf/mistral/mistral-7b-instruct-v0.1"
 
-# Load secrets from Secret Manager (safely)
-# These are now global variables.
-CF_API_KEY = params.SecretParam("CF_API_KEY").value
-CF_ACCOUNT_ID = params.SecretParam("CF_ACCOUNT_ID").value
-# --- END OF CORRECTION ---
+logger = logging.getLogger(__name__)
 
 
-def generate_ai_content(prompt: str):
-    """
-    Generates AI content using the globally loaded secrets.
-    This function no longer loads secrets, it just uses them.
-    """
-    if not CF_ACCOUNT_ID or not CF_API_KEY:
-        print("❌ CRITICAL ERROR: Cloudflare secrets were not loaded at startup.")
-        raise ValueError("A required secret key was not found.")
+class AIError(Exception):
+    """Raised when the AI provider fails. The message is safe to log, not to show users."""
 
-    url = f"https://api.cloudflare.com/client/v4/accounts/{CF_ACCOUNT_ID}/ai/run/@cf/mistral/mistral-7b-instruct-v0.1"
-    headers = {"Authorization": f"Bearer {CF_API_KEY}"}
-    payload = {"prompt": prompt}
+
+def generate_ai_content(system_prompt: str, user_text: str, max_tokens: int = 300) -> str:
+    account_id = CF_ACCOUNT_ID.value
+    api_key = CF_API_KEY.value
+    if not account_id or not api_key:
+        raise AIError("Cloudflare secrets are not configured")
+
+    model = os.environ.get("CF_MODEL", DEFAULT_MODEL)
+    url = f"https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/{model}"
+    payload = {
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_text},
+        ],
+        "max_tokens": max_tokens,
+    }
 
     try:
-        print("--- Sending request to Cloudflare AI... ---")
-        response = requests.post(url, headers=headers, json=payload, timeout=25)
+        response = requests.post(
+            url, headers={"Authorization": f"Bearer {api_key}"}, json=payload, timeout=25
+        )
         response.raise_for_status()
-        data = response.json()
-        print("--- ✅ Successfully received response from Cloudflare AI. ---")
-        return data.get("result", {}).get("response", "[AI did not provide a valid response]")
+        text = (response.json().get("result") or {}).get("response")
+    except requests.exceptions.Timeout as exc:
+        raise AIError("Cloudflare request timed out") from exc
+    except requests.exceptions.HTTPError as exc:
+        # Log upstream details server-side only; never return them to the browser.
+        logger.error("Cloudflare HTTP error: %s", exc.response.text[:500])
+        raise AIError(f"Cloudflare returned HTTP {exc.response.status_code}") from exc
+    except (requests.exceptions.RequestException, ValueError) as exc:
+        raise AIError("Cloudflare request failed") from exc
 
-    except requests.exceptions.Timeout:
-        print("❌ CRITICAL ERROR: Request to Cloudflare timed out.")
-        return "[AI SERVER ERROR]: Connection timed out."
-    except requests.exceptions.HTTPError as http_err:
-        print(f"❌ HTTP ERROR occurred: {http_err.response.text}")
-        return f"[AI API Error on Server]: {http_err.response.text}"
-    except Exception as e:
-        print(f"❌ An unexpected error occurred: {e}")
-        return "[AI SERVER ERROR]: An unknown error occurred."
+    if not isinstance(text, str) or not text.strip():
+        raise AIError("Cloudflare returned an empty response")
+    return text.strip()

@@ -1,8 +1,6 @@
-// src/api/mockEnhanceAPI.js (Comprehensive Version)
+// src/api/suggestions.js - local (offline) autocomplete suggestions for skills and interests.
 
 export async function getEnhancedDescription(type, input) {
-  console.log(`%cCalling Mock AI for type: "${type}"`, 'color: #64ffda;');
-  console.log('%cInput:', 'color: #8892b0;', input);
 
   // No network delay needed for a mock API
   // await new Promise(resolve => setTimeout(resolve, 400)); 
@@ -74,6 +72,5 @@ export async function getEnhancedDescription(type, input) {
       response = { error: 'Invalid AI request type' };
   }
   
-  console.log('%cMock AI Response:', 'color: #64ffda;', response);
   return response;
 }

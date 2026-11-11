@@ -1,39 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { db, auth } from '../firebase/config';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { auth } from '../firebase/config';
+import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
+import { safeUrl } from '../utils/escape';
 
 function PublicPortfolio() {
   const { userId, versionId } = useParams();
-  const [portfolioData, setPortfolioData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: portfolioData, loading } = usePublishedPortfolio(userId, versionId);
   const [currentPageUrl, setCurrentPageUrl] = useState('');
-  
+
   const currentUser = auth.currentUser;
 
   useEffect(() => {
     setCurrentPageUrl(window.location.href);
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-    const docRef = doc(db, "portfolios", userId);
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const fullData = docSnap.data();
-        const versionToShow = versionId || fullData.meta?.activeVersion || 'default';
-        setPortfolioData(fullData.portfolios[versionToShow]);
-      }
-      setLoading(false);
-    });
-    return () => unsubscribe();
   }, [userId, versionId]);
 
-  const formatUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    return `https://${url}`;
-  };
+  const formatUrl = safeUrl;
 
   const isFutureYear = (year) => {
     if (!year || isNaN(year)) return false;
@@ -41,7 +23,8 @@ function PublicPortfolio() {
     return parseInt(year) > currentYear;
   };
 
-  if (loading || !portfolioData) return <div className="loading-screen">Loading...</div>;
+  if (loading) return <div className="loading-screen">Loading...</div>;
+  if (!portfolioData) return <div className="loading-screen">This portfolio does not exist or has not been published yet.</div>;
 
   const { theme = {}, userName, userSubtitle, profilePicUrl, bio, location, links, projects = { items: [] }, hardSkills = { items: [] }, softSkills = { items: [] }, interests = { items: [] }, education = {}, certifications = { items: [] }, blogPosts = { showOnPage: false, items: [] }, customSections = { showOnPage: false, items: [] } } = portfolioData;
   const layoutClass = theme.layout === 'compact' ? 'layout-compact' : 'layout-standard';
@@ -52,6 +35,11 @@ function PublicPortfolio() {
 
   return (
     <div className={`public-portfolio-container ${layoutClass}`} style={{ backgroundColor: theme.backgroundColor, color: theme.textColor }}>
+      <title>{`${userName || 'Portfolio'}${userSubtitle ? ' – ' + userSubtitle : ''}`}</title>
+      <meta name="description" content={(bio || '').slice(0, 160)} />
+      <meta property="og:title" content={`${userName || 'Portfolio'}${userSubtitle ? ' – ' + userSubtitle : ''}`} />
+      <meta property="og:description" content={(bio || '').slice(0, 160)} />
+      <meta property="og:type" content="profile" />
       <header className="hero-public">
         <div className="hero-main-content">
           {profilePicUrl && <img src={profilePicUrl} alt="Profile" className="profile-pic-public" style={{ borderColor: theme.accentColor }}/>}

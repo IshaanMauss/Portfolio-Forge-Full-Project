@@ -3,8 +3,11 @@ import { auth, storage } from '../firebase/config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-toastify';
 import { getEnhancedText } from '../api/enhanceAPI';
-import { getEnhancedDescription } from '../api/mockEnhanceAPI';
+import { getEnhancedDescription } from '../api/suggestions';
 import ToggleSwitch from './ToggleSwitch';
+
+const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
 
 function ControlPanel({ portfolioData, updatePortfolio }) {
   const [newProject, setNewProject] = useState({ title: '', keywords: '', description: '', githubUrl: '', liveUrl: '' });
@@ -26,27 +29,23 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
   
   const handleProfilePicUpload = async (e) => {
     const file = e.target.files[0];
+    e.target.value = '';
     if (!file || !auth.currentUser) return;
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      toast.error('Please choose a PNG, JPEG or WebP image.');
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      toast.error('Image is too large. Maximum size is 2 MB.');
+      return;
+    }
     setIsUploading(true);
-
-    // Step 1: Convert the image to a Data URL for the resume fix
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-        const dataUrl = reader.result;
-        updatePortfolio('profilePicDataUrl', dataUrl); // Save the Data URL
-    };
-    reader.onerror = (error) => {
-        console.error("Error converting file to Data URL", error);
-        toast.error("Could not process the image file locally.");
-    };
-
-    // Step 2: Upload to Firebase Storage as usual for live display
-    const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}/${file.name}`);
+    const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+    const storageRef = ref(storage, `profilePictures/${auth.currentUser.uid}/avatar-${Date.now()}.${ext}`);
     try {
-      await uploadBytes(storageRef, file);
+      await uploadBytes(storageRef, file, { contentType: file.type });
       const downloadURL = await getDownloadURL(storageRef);
-      updatePortfolio('profilePicUrl', downloadURL); // Save the regular URL
+      updatePortfolio('profilePicUrl', downloadURL);
       toast.success("Profile picture updated!");
     } catch (error) {
       console.error("Error uploading file:", error);
@@ -151,7 +150,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <label>Profile Picture</label>
         <div className="profile-pic-area">
           {portfolioData.profilePicUrl && <img src={portfolioData.profilePicUrl} alt="Profile Preview" className="profile-pic-preview" />}
-          <input type="file" accept="image/*" onChange={handleProfilePicUpload} disabled={isUploading} />
+          <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleProfilePicUpload} disabled={isUploading} />
           {isUploading && <p>Uploading...</p>}
         </div>
         <label>Full Name</label>
@@ -161,7 +160,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <label>Bio / About Me</label>
         <div className="ai-input-group">
           <textarea rows="4" value={portfolioData.bio || ''} onChange={e => updatePortfolio('bio', e.target.value)}></textarea>
-          <button onClick={() => handleAiEnhance('bio')} className="ai-button" disabled={aiLoading.bio}>✨</button>
+          <button onClick={() => handleAiEnhance('bio')} className="ai-button" aria-label="Enhance with AI" title="Enhance with AI" disabled={aiLoading.bio}>✨</button>
         </div>
         <label>Location (City, Country)</label>
         <div className="visibility-group">
@@ -224,7 +223,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <input type="text" placeholder="Keywords (for AI)" value={newProject.keywords} onChange={e => setNewProject(prev => ({ ...prev, keywords: e.target.value }))} />
         <div className="ai-input-group">
           <textarea placeholder="Project description..." rows="4" value={newProject.description} onChange={e => setNewProject(prev => ({ ...prev, description: e.target.value }))}></textarea>
-          <button onClick={() => handleAiEnhance('project')} className="ai-button" disabled={aiLoading.project}>✨</button>
+          <button onClick={() => handleAiEnhance('project')} className="ai-button" aria-label="Enhance with AI" title="Enhance with AI" disabled={aiLoading.project}>✨</button>
         </div>
         <input type="url" placeholder="Project GitHub URL" value={newProject.githubUrl} onChange={e => setNewProject(prev => ({ ...prev, githubUrl: e.target.value }))} />
         <input type="url" placeholder="Project Live Demo URL" value={newProject.liveUrl} onChange={e => setNewProject(prev => ({ ...prev, liveUrl: e.target.value }))} />

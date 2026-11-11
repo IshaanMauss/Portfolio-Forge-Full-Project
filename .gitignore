@@ -1,0 +1,23 @@
+# dependencies / builds
+node_modules/
+build/
+dist/
+.firebase/
+
+# env & secrets (examples are allowed)
+.env
+.env.*
+!.env.example
+
+# python
+__pycache__/
+venv/
+.venv/
+
+# logs / OS / editors
+*.log
+firebase-debug*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

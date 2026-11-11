@@ -1,0 +1,40 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: portfolio-forge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: portfolio-forge/package-lock.json
+      - run: npm ci
+      - run: npm test -- --watchAll=false
+      - run: npm run build
+        env:
+          CI: "true"
+          REACT_APP_FIREBASE_API_KEY: ci
+          REACT_APP_FIREBASE_AUTH_DOMAIN: ci.firebaseapp.com
+          REACT_APP_FIREBASE_PROJECT_ID: ci
+          REACT_APP_FIREBASE_STORAGE_BUCKET: ci.appspot.com
+          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: "0"
+          REACT_APP_FIREBASE_APP_ID: ci
+
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r portfolio-forge-backend/functions/requirements.txt
+      - run: python -m compileall portfolio-forge-backend/functions

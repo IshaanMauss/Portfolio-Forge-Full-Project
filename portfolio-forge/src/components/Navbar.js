@@ -8,10 +8,11 @@ import './Navbar.css';
 
 const NewVersionToast = ({ closeToast, onConfirm }) => {
     const [name, setName] = useState('');
+    const [goal, setGoal] = useState('');
     
     const handleSubmit = () => {
         if (name.trim()) {
-            onConfirm(name.trim());
+            onConfirm(name.trim(), goal.trim());
             closeToast();
         }
     };
@@ -25,6 +26,13 @@ const NewVersionToast = ({ closeToast, onConfirm }) => {
                 onChange={e => setName(e.target.value)}
                 placeholder="E.g., For Game Developer Jobs"
                 autoFocus
+                onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+            />
+            <input
+                type="text"
+                value={goal}
+                onChange={e => setGoal(e.target.value)}
+                placeholder="Goal / target role (optional, private)"
                 onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             />
             <div className="toast-actions">
@@ -51,7 +59,7 @@ const DeleteConfirmToast = ({ closeToast, onConfirm, portfolioName }) => {
 
 // --- NAVBAR COMPONENT ---
 
-function Navbar({ user, handleSave, portfolioData, setPortfolioData, activePortfolio, setActivePortfolio, handleDeleteVersion }) {
+function Navbar({ user, handleSave, unpublished, portfolioData, setPortfolioData, activePortfolio, setActivePortfolio, handleDeleteVersion }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -60,12 +68,12 @@ function Navbar({ user, handleSave, portfolioData, setPortfolioData, activePortf
   const handleVersionChange = (e) => { setActivePortfolio(e.target.value); };
 
   const triggerCreateNewVersion = () => {
-    const handleConfirm = (newVersionName) => {
+    const handleConfirm = (newVersionName, goal) => {
       const newVersionId = `v_${Date.now()}`;
       const basePortfolio = JSON.parse(JSON.stringify(portfolioData.portfolios[activePortfolio] || {}));
 
       setPortfolioData(prev => {
-        const newVersions = [...(prev.meta?.versions || []), { id: newVersionId, name: newVersionName }];
+        const newVersions = [...(prev.meta?.versions || []), { id: newVersionId, name: newVersionName, goal: goal || '' }];
         const newPortfolios = { ...prev.portfolios, [newVersionId]: basePortfolio };
         return { ...prev, meta: { ...prev.meta, versions: newVersions }, portfolios: newPortfolios };
       });
@@ -108,7 +116,7 @@ function Navbar({ user, handleSave, portfolioData, setPortfolioData, activePortf
                 <li className="nav-item version-selector">
                   <span className="version-label">Current Portfolio:</span>
                   <select value={activePortfolio} onChange={handleVersionChange}>
-                    {versions.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                    {versions.map(v => <option key={v.id} value={v.id}>{v.goal ? `${v.name} — ${v.goal}` : v.name}</option>)}
                   </select>
                   <button onClick={triggerCreateNewVersion} className="new-version-btn" title="Create New Version">+</button>
                   {versions.length > 1 && activePortfolio !== 'default' && (
@@ -119,7 +127,7 @@ function Navbar({ user, handleSave, portfolioData, setPortfolioData, activePortf
                 </li>
                 <li className="nav-item"><a href={`/p/${user.uid}/${activePortfolio}`} target="_blank" rel="noopener noreferrer" className="nav-link">Public View</a></li>
                 <li className="nav-item"><a href={`/resume/${user.uid}/${activePortfolio}`} target="_blank" rel="noopener noreferrer" className="nav-link">Web Resume</a></li>
-                <li className="nav-item"><button onClick={handleSave} className="nav-link-button save">Save</button></li>
+                <li className="nav-item"><button onClick={handleSave} className="nav-link-button save" title={unpublished ? 'You have unpublished changes' : 'Everything is published'}>Save &amp; Publish{unpublished ? ' •' : ''}</button></li>
               </>
             )}
             <li className="nav-item">

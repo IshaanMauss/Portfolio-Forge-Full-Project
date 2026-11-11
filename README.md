@@ -1,81 +1,56 @@
-# Portfolio Forge 🚀
+# Portfolio Forge
 
-Portfolio Forge ek full-stack web application hai jo users ko apna personal portfolio website banane, manage karne, aur live deploy karne me madad karta hai. Isme AI-powered content enhancement jaisa advanced feature bhi hai.
+Free, open-source portfolio and resume builder. Build several **goal-based versions** of your
+portfolio (e.g. "Backend jobs", "Game dev"), share a public link per version, and download an
+ATS-friendly PDF resume.
 
-## ✨ Features
+## Features
 
-* **Google Authentication:** Google account se aasan login.
-* **Portfolio Management:** Bio, skills, projects, education, aur certifications ko aaram se add, edit, ya delete karein.
-* **AI Content Enhancement:** Cloudflare Workers AI ka istemal karke apne bio aur project descriptions ko professional banayein.
-* **Real-time Live Preview:** Left side me changes karein aur right side me unka live preview dekhein.
-* **Theme Customization:** Apne portfolio ka font, background color, text color, aur accent color chunein.
-* **Public URL:** Har user ko ek unique public URL milta hai (`/p/your-user-id`) jise woh share kar sakta hai.
-* **Web Resume:** Ek alag se, saaf-suthra web resume page jo PDF me download kiya ja sakta hai.
+* Google sign-in, live preview, theme colours, two layouts
+* Multiple portfolio versions, each with a private goal note
+* Autosaved private drafts; **Save & Publish** writes a sanitized public copy
+* Public portfolio `/p/<uid>/<version>` and web resume `/resume/<uid>/<version>`
+* Text-based PDF (browser print) plus a quick image PDF fallback
+* AI bio/project polish (Cloudflare Workers AI) with login + daily limits
 
-## 🛠️ Tech Stack
+## Architecture & security model
 
-* **Frontend:** React, React Router, Firebase SDK
-* **Backend:** Firebase (Authentication, Firestore, Storage, Cloud Functions for Python)
-* **External APIs:** Cloudflare Workers AI (`mistral-7b-instruct-v0.1`)
-* **Styling:** Plain CSS
+| Data | Location | Who can read | Who can write |
+| --- | --- | --- | --- |
+| Editable draft (all versions, address, hidden fields, version names/goals) | Firestore `portfolios/{uid}` | owner | owner |
+| Public copy (hidden sections, address, version names stripped) | Firestore `published/{uid}` + `published/{uid}/versions/{id}` | anyone | owner |
+| Profile pictures | Storage `profilePictures/{uid}/...` (image, < 2 MB) | anyone | owner |
+| AI usage counters | Firestore `aiUsage/*` | nobody (server only) | Cloud Function |
 
-## ⚙️ Local Setup
+Rules live in `firestore.rules` and `storage.rules`. The preview iframe is sandboxed and all
+user text is escaped. Version ids in public URLs are guessable-ish: treat published versions
+as public.
 
-Is project ko apne local computer par chalane ke liye:
+## Local setup
 
-### Prerequisites
+Prerequisites: Node 18+, Python 3.12, Firebase CLI.
 
-* Node.js (v18 ya usse upar)
-* Python (v3.11 ya usse upar)
-* Firebase CLI
+```bash
+git clone https://github.com/IshaanMauss/Portfolio-Forge-Full-Project.git
+cd Portfolio-Forge-Full-Project/portfolio-forge
+cp .env.example .env.local      # fill in your Firebase web app config
+npm install
+npm start                        # http://localhost:3000
+```
 
-### Installation & Running
+AI backend (optional locally): set the secrets and run `firebase emulators:start` from the repo root.
 
-1.  **Repository ko Clone karein:**
-    ```bash
-    git clone [https://github.com/your-username/Portfolio-Forge-Full-Project.git](https://github.com/your-username/Portfolio-Forge-Full-Project.git)
-    cd Portfolio-Forge-Full-Project
-    ```
+## Deploy
 
-2.  **Backend Setup:**
-    ```bash
-    cd portfolio-forge-backend
-    # Virtual environment banayein aur activate karein
-    python -m venv venv
-    source venv/bin/activate  # Mac/Linux
-    # .\venv\Scripts\activate  # Windows
+```bash
+cd portfolio-forge && npm ci && npm run build && cd ..
+firebase deploy                   # hosting, functions, firestore + storage rules
+gsutil cors set portfolio-forge/cors.json gs://<your-bucket>   # one-time, for image CORS
+```
 
-    # Dependencies install karein
-    pip install -r requirements.txt
+In Google Cloud, restrict the Firebase web API key to your domains (HTTP referrers) and set a
+billing budget alert.
 
-    # .env file banayein aur apni Cloudflare keys daalein
-    # CF_API_KEY=your_key
-    # CF_ACCOUNT_ID=your_id
-    ```
+## Contributing / security
 
-3.  **Frontend Setup:**
-    ```bash
-    cd ../portfolio-forge
-    npm install
-
-    # .env file banayein aur apni Firebase config keys daalein
-    # REACT_APP_FIREBASE_API_KEY=your_key
-    # ...
-    ```
-
-4.  **Project ko Chalayein:**
-    * Ek terminal me, `portfolio-forge-backend` folder se Firebase Emulator start karein:
-        ```bash
-        firebase emulators:start
-        ```
-    * Dusre terminal me, `portfolio-forge` folder se React app start karein:
-        ```bash
-        npm start
-        ```
-
-## 🚀 Deployment
-
-Yeh project Firebase par deploy kiya gaya hai.
-1.  Frontend app ko build karein (`npm run build`).
-2.  `build` folder ko `portfolio-forge-backend` folder ke andar copy karein.
-3.  Backend folder se `firebase deploy` command chalayein.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md). License: MIT.

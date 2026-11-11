@@ -1,39 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { db } from '../firebase/config';
-import { doc, getDoc } from 'firebase/firestore';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
+import { safeUrl } from '../utils/escape';
 import ToggleSwitch from './ToggleSwitch';
 import './Resume.css';
 import { toast } from 'react-toastify';
 
 function Resume() {
   const { userId, versionId } = useParams();
-  const [portfolioData, setPortfolioData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: portfolioData, loading } = usePublishedPortfolio(userId, versionId);
   const [applyTheme, setApplyTheme] = useState(false);
 
-  useEffect(() => {
-    const fetchPortfolio = async () => {
-      if (!userId) { setLoading(false); return; }
-      const docRef = doc(db, "portfolios", userId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const fullData = docSnap.data();
-        const versionToShow = versionId || fullData.meta?.activeVersion || 'default';
-        setPortfolioData(fullData.portfolios[versionToShow]);
-      }
-      setLoading(false);
-    };
-    fetchPortfolio();
-  }, [userId, versionId]);
-
-  const formatUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    return `https://${url}`;
-  };
+  const formatUrl = safeUrl;
 
   const isFutureYear = (year) => {
     if (!year || isNaN(year)) return false;
@@ -43,7 +21,10 @@ function Resume() {
 
   // ... (existing imports and other code above exportToPdf function) ...
 
-  const exportToPdf = () => {
+  const printResume = () => window.print();
+
+  // Quick image-based PDF (not selectable / not ATS friendly) - kept as a fallback.
+  const exportToPdf = async () => {
     const resumeElement = document.getElementById('resume-content');
     const { userName = 'User' } = portfolioData;
 
@@ -52,6 +33,9 @@ function Resume() {
       return;
     }
     toast.info("Generating a high-quality PDF...");
+    const { default: html2canvas } = await import('html2canvas');
+    const jspdfModule = await import('jspdf');
+    const jsPDF = jspdfModule.jsPDF || jspdfModule.default;
 
     const scrollY = window.scrollY;
     window.scrollTo(0, 0);
@@ -59,7 +43,7 @@ function Resume() {
     html2canvas(resumeElement, {
         scale: 2.5, // **CHANGED: A balanced scale for great quality and smaller size**
         useCORS: true,
-        logging: true,
+        logging: false,
         dpi: 192, // **CHANGED: Reduced DPI, still great for screens**
         letterRendering: true,
     }).then(canvas => {
@@ -127,7 +111,7 @@ function Resume() {
     hardSkills = { items: [] }, softSkills = { items: [] },
     interests = { items: [] }, certifications = { items: [] },
     projects = { items: [] }, education, 
-    profilePicUrl, profilePicDataUrl, // Get the new Data URL field
+    profilePicUrl,
     theme = {}
   } = portfolioData;
 
@@ -138,16 +122,17 @@ function Resume() {
     '--header-color': theme.textColor || '#112240',
   };
 
-  // Prioritize the Data URL for the image source to bypass CORS completely
-  const imageToDisplay = profilePicDataUrl || profilePicUrl;
+  const imageToDisplay = profilePicUrl;
 
   return (
     <>
+      <title>{`${userName || 'Resume'} – Resume`}</title>
       <div className="resume-actions">
         <div className="theme-toggle-wrapper">
           <ToggleSwitch label="Apply Portfolio Theme" checked={applyTheme} onChange={() => setApplyTheme(!applyTheme)} />
         </div>
-        <button onClick={exportToPdf}>Download as PDF</button>
+        <button onClick={printResume} title="Opens the print dialog - choose 'Save as PDF'. Text stays selectable and ATS-readable.">Download PDF (text, ATS-friendly)</button>
+        <button onClick={exportToPdf} title="Quick image-based PDF">Quick image PDF</button>
       </div>
       <div id="resume-content" className={`resume-container ${applyTheme ? 'theme-applied' : ''}`} style={applyTheme ? dynamicStyles : {}}>
         <header className="resume-header">

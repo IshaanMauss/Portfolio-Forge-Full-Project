@@ -1,0 +1,15 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Profile pictures: world-readable (shown on public portfolios),
+    // writable only by the owner, images only, max 2 MB.
+    match /profilePictures/{userId}/{fileName} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+                            && request.auth.uid == userId
+                            && request.resource.size < 2 * 1024 * 1024
+                            && request.resource.contentType.matches('image/(png|jpeg|webp)');
+      allow delete: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}

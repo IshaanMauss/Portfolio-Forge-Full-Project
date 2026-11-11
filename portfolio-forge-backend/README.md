@@ -1,10 +1,19 @@
-# ML API Backend
+# Backend (Firebase Cloud Functions, Python)
 
-This backend uses Flask and Cloudflare AI to generate content for bios, hard skills, soft skills, hobbies, and project descriptions.
+Single HTTPS function `api_v2` that proxies AI text enhancement (Cloudflare Workers AI).
 
-## Setup
+* `POST /api_v2/enhance-bio` `{ "bio": "..." }`
+* `POST /api_v2/enhance-project` `{ "project_info": "..." }`
 
-1. Copy `.env.example` to `.env` and fill in your Cloudflare credentials.
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run locally: `python main.py`
-4. Deploy to Google Cloud Function with entry point `app`.
+Requires a Firebase ID token (`Authorization: Bearer <token>`), enforces per-user and
+global daily limits, and only allows the app's own origins. See `functions/.env.example`.
+
+Secrets (never commit them):
+
+```bash
+firebase functions:secrets:set CF_API_KEY
+firebase functions:secrets:set CF_ACCOUNT_ID
+```
+
+Deploy from the repository root: `firebase deploy --only functions`.
+Python functions need the Firebase **Blaze** plan - set a budget alert in Google Cloud.
