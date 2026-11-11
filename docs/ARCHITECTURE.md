@@ -19,7 +19,8 @@ Browser (SPA)
 | Editable draft | `portfolios/{uid}` | owner | owner |
 | Public copy (sanitised) | `published/{uid}`, `published/{uid}/versions/{id}` | anyone | owner |
 | Profile picture | Storage `profilePictures/{uid}/*` (image, < 2 MB) | anyone | owner |
-| AI counters | `aiUsage/*` | nobody | server only |
+| AI counters (Cloud Function path) | `aiUsage/*` | nobody | server only |
+| Job tracker | `tracker/{uid}` | owner | owner |
 
 Design rule: **the browser is untrusted.** Authorisation lives in `firestore.rules` and `storage.rules`,
 not in the UI. A draft never becomes public unless the owner publishes; `sanitizeForPublic` strips
@@ -50,11 +51,27 @@ hold for an attacker who has read all the code.
 - Autosave is debounced (3 s) and only writes when the data changed; publishing is one batched write.
 - Heavy work (ATS parsing, PDF editing) is client-side: zero server cost and zero egress per use.
 
+## Edge Worker (implemented, needs deploying)
+
+`portfolio-forge-worker/` sits in front of the app on a custom domain: injects Open Graph tags for shared
+portfolio links, adds HTTP security headers (nosniff, Referrer-Policy, Permissions-Policy, HSTS), and hosts
+the AI gateway (Firebase token check, per-user and global quotas, Workers AI binding). See its README.
+
+## Client-side features
+
+- ATS checker v2: parser view with confidence, phrase-aware job matching, evidence vs skills-only terms,
+  before/after comparison.
+- Import: resume PDF parser and GitHub import (public repos, deterministic, evidence per bullet).
+  See `docs/GITHUB_IMPORT.md`.
+- 3D constellation on the public portfolio (opt-in): lazy-loaded, drag/tap, reduced-motion safe, PNG export.
+- Job tracker: private `tracker/{uid}` document (owner-only rules, 200-entry cap, debounced writes),
+  included in data export and account deletion.
+
 ## Planned (not implemented yet)
 
 - Firebase App Check to reject non-app clients.
-- HTTP security headers in `firebase.json` (CSP, HSTS, Referrer-Policy, Permissions-Policy).
-- Server-rendered public pages (Next.js) for rich link previews and `/u/username` URLs.
+- A Content-Security-Policy (needs a pass over fonts, Firebase and the 3D scene before enforcing).
+- `/u/username` vanity URLs and server-rendered pages (previews are covered by the Worker for now).
 - Caching headers and CDN rules for static assets and published pages.
 - Staging Firebase project and automated rules tests with the emulator.
 - Multiple portfolio versions per account (code exists; UI paused behind `FEATURES.multiVersion`).

@@ -22,6 +22,7 @@ const PdfEditor = lazy(() => import('./components/PdfEditor'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Account = lazy(() => import('./pages/Account'));
+const Tracker = lazy(() => import('./pages/Tracker'));
 
 const AUTOSAVE_DELAY_MS = 3000;
 
@@ -280,6 +281,7 @@ function App() {
           />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/tracker" element={<Tracker user={user} />} />
           <Route path="/account" element={<Account user={user} />} />
           <Route path="/tools/ats" element={<AtsChecker />} />
           <Route path="/tools/pdf" element={<PdfEditor />} />

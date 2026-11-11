@@ -7,10 +7,12 @@ import { auth, db, storage, googleProvider } from '../firebase/config';
 export async function exportMyData() {
   const user = auth.currentUser;
   const draft = await getDoc(doc(db, 'portfolios', user.uid));
+  const tracker = await getDoc(doc(db, 'tracker', user.uid));
   return {
     exportedAt: new Date().toISOString(),
     account: { uid: user.uid, name: user.displayName, email: user.email },
     portfolioDraft: draft.exists() ? draft.data() : null,
+    jobTracker: tracker.exists() ? tracker.data() : null,
   };
 }
 
@@ -26,6 +28,7 @@ export async function deleteMyAccount() {
   versions.forEach((d) => batch.delete(d.ref));
   batch.delete(doc(db, 'published', uid));
   batch.delete(doc(db, 'portfolios', uid));
+  batch.delete(doc(db, 'tracker', uid));
   await batch.commit();
 
   const files = await listAll(ref(storage, `profilePictures/${uid}`));

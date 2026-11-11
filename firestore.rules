@@ -12,6 +12,12 @@ service cloud.firestore {
       allow read, write: if isOwner(userId);
     }
 
+    // PRIVATE: the job-application tracker. One small document per user; the size is also capped
+    // by the client (200 entries). Never public.
+    match /tracker/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
     // PUBLIC: sanitized copies written by the owner on "Save & Publish".
     // Anyone may read (that is what makes /p/:uid and /resume/:uid work for
     // logged-out visitors); only the owner may write. Hidden sections, the

@@ -1,0 +1,15 @@
+.tracker-form { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+.tracker-form input { padding: 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 16px; min-width: 0; }
+.tracker-form button { grid-column: 1 / -1; }
+.tracker-filters { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.job-list { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+.job-card { background: var(--surface); border: 1px solid var(--border); border-left-width: 4px; border-radius: var(--radius-sm); padding: 0.9rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.job-card.st-applied { border-left-color: var(--link); } .job-card.st-interview { border-left-color: var(--cta); }
+.job-card.st-offer { border-left-color: var(--primary); } .job-card.st-rejected { border-left-color: var(--danger); opacity: 0.8; }
+.job-top { display: flex; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+.job-top select, .job-card textarea { padding: 0.55rem; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 16px; }
+.job-card textarea { width: 100%; resize: vertical; }
+.job-card a { color: var(--link); }
+.job-badges { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.job-card .pe-btn { align-self: flex-start; min-height: 40px; }
+@media (max-width: 560px) { .tracker-form { grid-template-columns: 1fr; } }

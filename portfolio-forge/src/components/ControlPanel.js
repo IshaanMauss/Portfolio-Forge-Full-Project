@@ -7,6 +7,7 @@ import { getEnhancedText } from '../api/enhanceAPI';
 import { getEnhancedDescription } from '../api/suggestions';
 import ToggleSwitch from './ToggleSwitch';
 import ImportPanel from './ImportPanel';
+import { FEATURES } from '../utils/features';
 import { PORTFOLIO_PALETTES } from '../utils/palettes';
 
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
@@ -164,7 +165,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <label>Bio / About Me</label>
         <div className="ai-input-group">
           <textarea rows="4" value={portfolioData.bio || ''} onChange={e => updatePortfolio('bio', e.target.value)}></textarea>
-          <button onClick={() => handleAiEnhance('bio')} className="ai-button" aria-label="Enhance with AI" title="Enhance with AI" disabled={aiLoading.bio}>✨</button>
+          {FEATURES.ai && <button onClick={() => handleAiEnhance('bio')} className="ai-button" aria-label="Enhance with AI" title="Enhance with AI" disabled={aiLoading.bio}>✨</button>}
         </div>
         <label>Location (City, Country)</label>
         <div className="visibility-group">
@@ -227,7 +228,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <input type="text" placeholder="Keywords (for AI)" value={newProject.keywords} onChange={e => setNewProject(prev => ({ ...prev, keywords: e.target.value }))} />
         <div className="ai-input-group">
           <textarea placeholder="Project description..." rows="4" value={newProject.description} onChange={e => setNewProject(prev => ({ ...prev, description: e.target.value }))}></textarea>
-          <button onClick={() => handleAiEnhance('project')} className="ai-button" aria-label="Enhance with AI" title="Enhance with AI" disabled={aiLoading.project}>✨</button>
+          {FEATURES.ai && <button onClick={() => handleAiEnhance('project')} className="ai-button" aria-label="Enhance with AI" title="Enhance with AI" disabled={aiLoading.project}>✨</button>}
         </div>
         <input type="url" placeholder="Project GitHub URL" value={newProject.githubUrl} onChange={e => setNewProject(prev => ({ ...prev, githubUrl: e.target.value }))} />
         <input type="url" placeholder="Project Live Demo URL" value={newProject.liveUrl} onChange={e => setNewProject(prev => ({ ...prev, liveUrl: e.target.value }))} />

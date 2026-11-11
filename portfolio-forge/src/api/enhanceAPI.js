@@ -1,6 +1,7 @@
 import { auth } from '../firebase/config';
 
-const API_BASE_URL = '/api_v2';
+// Set REACT_APP_AI_URL to your Worker, e.g. https://portfolio-forge.<you>.workers.dev/api
+const API_BASE_URL = process.env.REACT_APP_AI_URL || '/api_v2';
 
 // Calls the AI backend. The user's Firebase ID token is sent so the server can
 // verify who is asking and enforce per-user daily limits.

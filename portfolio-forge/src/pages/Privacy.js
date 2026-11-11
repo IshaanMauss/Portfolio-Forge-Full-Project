@@ -29,9 +29,11 @@ function Privacy() {
         <tbody>
           <tr><td>Google account name, email, photo, and a user ID (when you sign in)</td><td>To sign you in and attach your portfolio to you</td><td>Firebase Authentication (Google Cloud). Not shown publicly by us.</td></tr>
           <tr><td>Your portfolio content: bio, experience, projects, links, theme</td><td>To provide the editor</td><td>Private draft in Cloud Firestore, visible only to you</td></tr>
+          <tr><td>Job tracker entries you add (company, role, link, notes, deadlines)</td><td>To provide the tracker</td><td>Private document in Cloud Firestore, visible only to you</td></tr>
           <tr><td>Published copy of your portfolio</td><td>To give you a shareable link</td><td>Cloud Firestore, <strong>public</strong>. Hidden sections and your address are removed first.</td></tr>
           <tr><td>Profile picture you upload</td><td>To show on your portfolio</td><td>Cloud Storage; public if you publish</td></tr>
           <tr><td>AI-assist text you submit (optional)</td><td>To suggest wording</td><td>Sent to Cloudflare Workers AI to generate the reply. We keep only a per-day usage counter.</td></tr>
+          <tr><td>GitHub username you type into the import tool</td><td>To list your <em>public</em> repositories</td><td>Sent from your browser straight to GitHub&apos;s public API; we do not store it</td></tr>
           <tr><td>Theme choice and similar settings</td><td>To remember your preferences</td><td>Your browser&apos;s local storage only</td></tr>
         </tbody>
       </table>

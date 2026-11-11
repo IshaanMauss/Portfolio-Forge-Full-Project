@@ -149,6 +149,7 @@ function Navbar({ user, handleSave, unpublished, portfolioData, setPortfolioData
                 <li className="nav-item"><Link to={`/resume/${user.uid}/${activePortfolio}`} className="nav-link" onClick={() => setMenuOpen(false)}>Web Resume</Link></li>
               </>
             )}
+            {user && <li className="nav-item"><Link to="/tracker" className="nav-link" onClick={() => setMenuOpen(false)}>Job Tracker</Link></li>}
             {user && <li className="nav-item"><Link to="/account" className="nav-link" onClick={() => setMenuOpen(false)}>Account</Link></li>}
             {user && <li className="nav-item"><button onClick={handleSignOut} className="nav-link-button">Sign Out</button></li>}
         </ul>

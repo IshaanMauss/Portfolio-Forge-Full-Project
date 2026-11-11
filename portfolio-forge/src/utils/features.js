@@ -4,4 +4,6 @@ export const FEATURES = {
   multiVersion: false,
   // Advertising. Off until ad code is added; turns on the consent banner when true.
   ads: false,
+  // AI text suggestions. On only when an AI endpoint (Worker or Cloud Function) is configured.
+  ai: Boolean(process.env.REACT_APP_AI_URL),
 };
