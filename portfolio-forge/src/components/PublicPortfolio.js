@@ -5,6 +5,7 @@ import { auth } from '../firebase/config';
 import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
 import { safeUrl, safeColor } from '../utils/escape';
 import { PORTFOLIO_FONTS, fontQuery } from '../utils/fonts';
+import Seo from '../seo/Seo';
 const Constellation3D = lazy(() => import('./Constellation3D'));
 const ParticleField = lazy(() => import('./ParticleField'));
 const FeedbackToast = lazy(() => import('./FeedbackToast'));
@@ -78,11 +79,7 @@ function PublicPortfolio() {
 
   return (
     <div className={`public-portfolio-container ${layoutClass}`} style={containerStyle}>
-      <title>{`${userName || 'Portfolio'}${userSubtitle ? ' – ' + userSubtitle : ''}`}</title>
-      <meta name="description" content={(bio || '').slice(0, 160)} />
-      <meta property="og:title" content={`${userName || 'Portfolio'}${userSubtitle ? ' – ' + userSubtitle : ''}`} />
-      <meta property="og:description" content={(bio || '').slice(0, 160)} />
-      <meta property="og:type" content="profile" />
+      <Seo title={`${userName || 'Portfolio'}${userSubtitle ? ' – ' + userSubtitle : ''}`} description={(bio || '').slice(0, 160)} path={`/p/${userId}${versionId ? '/' + versionId : ''}`} noindex={(bio || '').trim().length < 60} />
       <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${fontQuery(font)}&display=swap`} precedence="default" />
       <header className="hero-public">
         <div className="hero-main-content">

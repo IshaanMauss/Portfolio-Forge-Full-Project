@@ -1,0 +1,2 @@
+# Add your Google AdSense line here once AdSense gives you a publisher ID, for example:
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0

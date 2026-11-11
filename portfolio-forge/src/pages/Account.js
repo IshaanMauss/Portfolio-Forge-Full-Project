@@ -5,6 +5,7 @@ import { auth } from '../firebase/config';
 import { exportMyData, deleteMyAccount } from '../utils/deleteAccount';
 import '../components/Tools.css';
 import '../components/Legal.css';
+import Seo from '../seo/Seo';
 
 function Account({ user }) {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ function Account({ user }) {
 
   return (
     <main className="tool-page">
-      <title>Account | Portfolio Forge</title>
+      <Seo title="Account – Portfolio Forge" path="/account" noindex />
       <header className="tool-head rise"><h1>Your account</h1><p>Signed in as {auth.currentUser?.email}. Your data, your control.</p></header>
 
       <section className="tool-card rise" style={{ '--d': '60ms' }}>

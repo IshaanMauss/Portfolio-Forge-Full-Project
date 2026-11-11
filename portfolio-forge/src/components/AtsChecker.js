@@ -4,6 +4,9 @@ import { useFileDrop } from '../utils/useFileDrop';
 import { extractPdf, looksLikePdf, MAX_PDF_BYTES } from '../utils/pdfText';
 import { parseResume } from '../utils/resumeImport';
 import './Tools.css';
+import { Link } from 'react-router-dom';
+import Seo from '../seo/Seo';
+import SiteFooter from './SiteFooter';
 
 const ICON = { pass: '✓', warn: '!', fail: '✕' };
 
@@ -66,8 +69,7 @@ function AtsChecker() {
 
   return (
     <main className="tool-page">
-      <title>Free ATS Resume Checker | Portfolio Forge</title>
-      <meta name="description" content="Check how well your resume reads to applicant tracking systems. Free, private: your PDF never leaves your device." />
+      <Seo page="ats" />
       <header className="tool-head rise">
         <span className="login-badge">Free · No login · Private</span>
         <h1>ATS resume checker</h1>
@@ -151,6 +153,30 @@ function AtsChecker() {
           )}
         </section>
       )}
+      <section className="tool-info">
+        <h2>How the ATS checker works</h2>
+        <p>Applicant tracking systems read the text inside your resume file, split it into sections and store the fields so recruiters can search them. This tool runs similar checks in your browser: it extracts the text from your PDF, looks for readable text, standard section headings, contact details, dates, bullet structure and length, and estimates how cleanly a parser could read the file.</p>
+        <h2>How to use the result</h2>
+        <ol>
+          <li>Upload your resume as a PDF. It is read on your device and is never sent to a server.</li>
+          <li>Fix anything marked as a problem first, such as missing text or missing sections.</li>
+          <li>Optionally paste a job description to see which keywords you already cover and which appear only in your skills list.</li>
+          <li>Export again and re-check until the main issues are gone.</li>
+        </ol>
+        <h2>Common reasons a resume scores low</h2>
+        <ul>
+          <li>The PDF is a scan or screenshot, so there is no real text to read.</li>
+          <li>Two columns, text boxes or tables mix up the reading order.</li>
+          <li>Section headings are creative instead of standard, such as My Journey instead of Experience.</li>
+          <li>Contact details are inside images, headers or icons.</li>
+        </ul>
+        <h2>Frequently asked questions</h2>
+        <p><strong>Is my resume uploaded anywhere?</strong> No. The check runs entirely in your browser.</p>
+        <p><strong>Is the score what employers see?</strong> No. Every employer uses different software. The score is an estimate meant to help you find real formatting problems, not a guarantee.</p>
+        <p><strong>Do I need an account?</strong> No. The tool is free and needs no sign-in.</p>
+        <p>For more detail, read our guide on <Link to="/guides/how-ats-resume-parsing-works">how ATS resume parsing works</Link> and on <Link to="/guides/resume-length-format-file-type">resume length, format and file type</Link>.</p>
+      </section>
+      <SiteFooter />
     </main>
   );
 }

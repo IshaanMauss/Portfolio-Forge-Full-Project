@@ -23,6 +23,10 @@ const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Account = lazy(() => import('./pages/Account'));
 const Tracker = lazy(() => import('./pages/Tracker'));
+const About = lazy(() => import('./pages/About'));
+const Contact = lazy(() => import('./pages/Contact'));
+const Guides = lazy(() => import('./pages/Guides'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const AUTOSAVE_DELAY_MS = 3000;
 
@@ -282,12 +286,17 @@ function App() {
           />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/guides" element={<Guides />} />
+          <Route path="/guides/:slug" element={<Guides />} />
           <Route path="/tracker" element={<Tracker user={user} />} />
           <Route path="/account" element={<Account user={user} />} />
           <Route path="/tools/ats" element={<AtsChecker />} />
           <Route path="/tools/pdf" element={<PdfEditor />} />
           <Route path="/p/:userId/:versionId?" element={<PublicPortfolio />} />
           <Route path="/resume/:userId/:versionId?" element={<Resume />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </>

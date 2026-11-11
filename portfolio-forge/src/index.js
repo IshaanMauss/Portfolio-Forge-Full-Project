@@ -10,6 +10,11 @@ import { applyTheme, getInitialTheme } from './utils/appTheme';
 
 applyTheme(getInitialTheme());
 
+// The build writes real SEO tags and content into each public page for crawlers. React renders its own
+// copies once it starts, so drop the static ones first to avoid duplicate titles or stale canonicals.
+document.querySelectorAll('title, meta[name="description"], meta[name="robots"], meta[property^="og:"], meta[name^="twitter:"], link[rel="canonical"], script[data-prerender]').forEach((el) => el.remove());
+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

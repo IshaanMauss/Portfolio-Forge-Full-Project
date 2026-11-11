@@ -4,6 +4,9 @@ import { loadPdfJs, looksLikePdf, MAX_PDF_BYTES } from '../utils/pdfText';
 import { useFileDrop } from '../utils/useFileDrop';
 import { buildPdf } from '../utils/pdfEdit';
 import './Tools.css';
+import { Link } from 'react-router-dom';
+import Seo from '../seo/Seo';
+import SiteFooter from './SiteFooter';
 
 const MAX_PAGES = 100;
 let uid = 0;
@@ -150,8 +153,7 @@ function PdfEditor() {
 
   return (
     <main className="tool-page">
-      <title>Free PDF Editor | Portfolio Forge</title>
-      <meta name="description" content="Merge, reorder, rotate PDF pages, add text and sign. Free and private: your PDF never leaves your device." />
+      <Seo page="pdf" />
       <header className="tool-head rise">
         <span className="login-badge">Free · No login · Private</span>
         <h1>PDF editor</h1>
@@ -219,6 +221,29 @@ function PdfEditor() {
           </div>
         </section>
       )}
+      <section className="tool-info">
+        <h2>What this PDF editor can do</h2>
+        <ul>
+          <li>Merge several PDFs into one file.</li>
+          <li>Reorder, rotate and remove pages.</li>
+          <li>Add text and place a signature on any page.</li>
+          <li>Download the result as a new PDF.</li>
+        </ul>
+        <h2>Why it is private</h2>
+        <p>Your files are opened and edited inside your browser using your own device. They are not uploaded to our servers, so documents such as contracts, forms and ID copies stay with you. Closing the tab discards the working copy.</p>
+        <h2>Tips</h2>
+        <ol>
+          <li>Keep a copy of your original file before you edit and download a new version.</li>
+          <li>Add all the files you want to combine first, then reorder the pages by dragging.</li>
+          <li>Zoom into the page thumbnail to check that added text and signatures are placed where you want them.</li>
+        </ol>
+        <h2>Frequently asked questions</h2>
+        <p><strong>Is there a file size limit?</strong> Very large files may be slow because everything runs on your device. If a file is slow, try splitting it first.</p>
+        <p><strong>Does it work on a phone?</strong> Yes, though large documents are easier on a laptop.</p>
+        <p><strong>Can it edit existing text in a PDF?</strong> No. It can add new text on top of pages. For a resume, build it in our editor and export a text-based PDF instead.</p>
+        <p>Related: <Link to="/tools/ats">free ATS resume checker</Link> and our <Link to="/guides">resume and portfolio guides</Link>.</p>
+      </section>
+      <SiteFooter />
     </main>
   );
 }

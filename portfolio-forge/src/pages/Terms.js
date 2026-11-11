@@ -2,12 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { SITE_NAME, REPO_URL, LEGAL_UPDATED } from '../utils/site';
 import '../components/Legal.css';
+import Seo from '../seo/Seo';
+import SiteFooter from '../components/SiteFooter';
 
 function Terms() {
   return (
     <main className="legal-page">
-      <title>Terms of Use | Portfolio Forge</title>
-      <meta name="description" content="The rules for using Portfolio Forge." />
+      <Seo page="terms" />
       <h1>Terms of Use</h1>
       <p className="updated">Last updated {LEGAL_UPDATED}</p>
       <p>By using {SITE_NAME} you agree to these terms. They are short on purpose.</p>
@@ -44,6 +45,7 @@ function Terms() {
 
       <h2>Privacy</h2>
       <p>See our <Link to="/privacy">Privacy Policy</Link> for how data is handled.</p>
+      <SiteFooter />
     </main>
   );
 }

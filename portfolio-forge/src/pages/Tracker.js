@@ -7,6 +7,7 @@ import { safeUrl } from '../utils/escape';
 import { STATUSES, MAX_JOBS, newJob, setStatus, daysUntil, needsFollowUp, counts, toCsv, normalizeJobs } from '../utils/tracker';
 import '../components/Tools.css';
 import '../components/Tracker.css';
+import Seo from '../seo/Seo';
 
 function Tracker({ user }) {
   const [jobs, setJobs] = useState(null);
@@ -53,7 +54,7 @@ function Tracker({ user }) {
 
   return (
     <main className="tool-page">
-      <title>Job tracker | Portfolio Forge</title>
+      <Seo title="Job tracker – Portfolio Forge" path="/tracker" noindex />
       <header className="tool-head rise"><h1>Job tracker</h1><p>Keep every application, deadline and follow-up in one place. Private to you.</p></header>
 
       <form className="tool-card tracker-form rise" onSubmit={add} style={{ '--d': '60ms' }}>

@@ -1,0 +1,247 @@
+{
+ "site": {
+  "name": "Portfolio Forge",
+  "tagline": "Free portfolio & resume builder"
+ },
+ "pages": {
+  "home": {
+   "path": "/",
+   "title": "Portfolio Forge – Free Portfolio & Resume Builder",
+   "description": "Build goal-based portfolios and ATS-friendly resumes for free. Share a public link, check your resume for ATS issues and edit PDFs privately in your browser.",
+   "h1": "Build a portfolio for every goal",
+   "blurb": "Portfolio Forge is a free, open-source portfolio and resume builder. Keep a separate portfolio for jobs, freelance work or college, share each with its own public link, and export a text-based PDF resume that applicant tracking systems can read.",
+   "ld": "home"
+  },
+  "ats": {
+   "path": "/tools/ats",
+   "title": "Free ATS Resume Checker – Private, No Sign-up",
+   "description": "Upload your resume PDF and see how applicant tracking systems read it. Checks text, structure, sections and keywords in your browser. Nothing is uploaded.",
+   "h1": "Free ATS resume checker",
+   "blurb": "Check whether your resume PDF can be read as real text, whether it has the standard sections, and how well it matches a job description. The check runs entirely in your browser, so your resume is never uploaded.",
+   "ld": "app"
+  },
+  "pdf": {
+   "path": "/tools/pdf",
+   "title": "Free PDF Editor – Merge, Rotate, Sign in Your Browser",
+   "description": "Merge, reorder and rotate PDF pages, add text and sign. Free and private: your files never leave your device.",
+   "h1": "Free PDF editor",
+   "blurb": "Merge several PDFs, reorder or rotate pages, add text and place a signature. Everything is done inside your browser with no upload, so sensitive documents stay on your device.",
+   "ld": "app"
+  },
+  "about": {
+   "path": "/about",
+   "title": "About Portfolio Forge – Free, Open-Source Resume Tools",
+   "description": "Why Portfolio Forge exists, how it is funded, how it handles your data and who maintains it.",
+   "h1": "About Portfolio Forge",
+   "blurb": "Portfolio Forge is a free, open-source portfolio and resume builder made by an independent developer in India. This page explains why it exists, how it is paid for and how your data is handled.",
+   "ld": "about"
+  },
+  "contact": {
+   "path": "/contact",
+   "title": "Contact Portfolio Forge – Support, Feedback, Privacy Requests",
+   "description": "How to reach the Portfolio Forge maintainer for support, bug reports, content reports and privacy requests.",
+   "h1": "Contact",
+   "blurb": "Questions, bug reports, content reports and privacy requests are all welcome. This page lists the best way to reach the maintainer for each.",
+   "ld": "contact"
+  },
+  "privacy": {
+   "path": "/privacy",
+   "title": "Privacy Policy – Portfolio Forge",
+   "description": "What Portfolio Forge stores, why, who can see it, how advertising and cookies work, and how to export or delete your data.",
+   "h1": "Privacy Policy",
+   "blurb": "What Portfolio Forge collects and why, how advertising and cookies work, and how to export or delete everything you stored.",
+   "ld": "page"
+  },
+  "terms": {
+   "path": "/terms",
+   "title": "Terms of Use – Portfolio Forge",
+   "description": "The rules for using Portfolio Forge: your content, what is not allowed, AI features and the free service.",
+   "h1": "Terms of Use",
+   "blurb": "The short rules for using Portfolio Forge: who can use it, what you own, what is not allowed and what the free service does and does not promise.",
+   "ld": "page"
+  },
+  "guides": {
+   "path": "/guides",
+   "title": "Resume & Portfolio Guides for Students and Job Seekers",
+   "description": "Practical, original guides on ATS resumes, building a portfolio, resume format and writing project descriptions.",
+   "h1": "Guides",
+   "blurb": "Practical guides on resumes, portfolios and project write-ups, written for students and early-career developers.",
+   "ld": "collection"
+  }
+ },
+ "guides": [
+  {
+   "slug": "how-ats-resume-parsing-works",
+   "title": "How ATS Resume Parsing Actually Works",
+   "description": "What an applicant tracking system does with your PDF, why some layouts break it and how to write a resume that survives parsing.",
+   "date": "2026-11-11",
+   "sections": [
+    {
+     "h": "What an ATS really does",
+     "p": [
+      "An applicant tracking system is mostly a database with a parser at the front. When you upload a resume, the parser extracts text from the file, tries to split it into fields such as name, contact details, employers, dates, education and skills, and stores those fields so a recruiter can search and filter them.",
+      "It does not read your resume the way a person does. It reads a stream of text, left to right and top to bottom as the file stores it, and then guesses which lines belong to which section."
+     ]
+    },
+    {
+     "h": "Why layout can break parsing",
+     "p": [
+      "Parsers work best on a single column of real text. Two-column layouts, text boxes and tables can be extracted in the wrong order, which mixes your skills list into the middle of a job description. Text that is actually an image, for example a screenshot or a scanned page, gives the parser nothing to read at all.",
+      "Icons and decorative symbols are another common problem. A phone icon followed by a number may be read as strange characters, so write the words or just the number."
+     ]
+    },
+    {
+     "h": "Sections the parser looks for",
+     "p": [
+      "Most parsers look for familiar headings such as Summary, Skills, Experience or Projects, Education and Certifications. Creative titles like My Journey or Things I Am Good At are easy for a person to enjoy but harder for software to classify. Use plain headings and keep dates in a consistent format, for example Jun 2024 to Aug 2025."
+     ]
+    },
+    {
+     "h": "Keywords without stuffing",
+     "p": [
+      "Recruiters often search for specific tools and job titles. If a job description asks for React and Node.js and you really have used them, say so in plain words in your skills and in the project or job bullet where you used them. Repeating a keyword twenty times does not help and reads badly to the human who sees your resume next.",
+      "A good habit is to compare your resume with the job description once, list the requirements you genuinely meet and make sure each one appears somewhere with evidence."
+     ]
+    },
+    {
+     "h": "Check your own file",
+     "p": [
+      "The simplest test is to open your PDF, select all the text and paste it into a plain text editor. If the text is missing, scrambled or out of order, a parser will see the same thing. A free checker such as the one on this site runs the same kind of test in your browser and points out missing sections and unreadable areas. Treat any score as a guide to fixing real problems, not as the score any employer's system will give you."
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "portfolio-for-freshers",
+   "title": "A Fresher's Guide to Building a Portfolio That Gets Read",
+   "description": "What to include, what to leave out and how to present projects when you have little or no work experience.",
+   "date": "2026-11-11",
+   "sections": [
+    {
+     "h": "Start with the reader",
+     "p": [
+      "A recruiter or hiring manager may spend under a minute on your portfolio. They want to know three things quickly: who you are, what you can do and where the proof is. Everything on the page should help answer one of those questions."
+     ]
+    },
+    {
+     "h": "Pick fewer, better projects",
+     "p": [
+      "Three well explained projects beat ten half finished ones. Choose projects that show different skills, for example one with a user interface, one with a backend and a database and one that solves a problem you personally had. Remove tutorials you copied without changes, because experienced reviewers recognise them immediately."
+     ]
+    },
+    {
+     "h": "Explain each project in four lines",
+     "p": [
+      "For every project write what it does, who it is for, which tools you used and what you personally built or decided. Add one number or fact if you have it, such as how many users tried it or how much faster a query became. Link to the live version and the source code so a reviewer can check your claims."
+     ]
+    },
+    {
+     "h": "Show your thinking",
+     "p": [
+      "Mention one problem you hit and how you solved it. A short note like the page was slow because it loaded every record, so I added pagination and an index tells a reviewer far more about you than a list of technologies."
+     ]
+    },
+    {
+     "h": "Keep it simple to open",
+     "p": [
+      "Use a clean layout, readable text size and colours with enough contrast. Check the page on a phone, because many recruiters open links from messages on mobile. Put your contact link or email where it is easy to find and keep a plain text PDF resume available for applications that ask for one."
+     ]
+    },
+    {
+     "h": "Keep it current",
+     "p": [
+      "Review your portfolio every few months. Remove old projects that no longer represent your level, add new ones and fix broken links. A portfolio that is small and current is better than one that is large and outdated."
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "resume-length-format-file-type",
+   "title": "Resume Length, Format and File Type: What to Choose",
+   "description": "One page or two, PDF or Word, and how to format a resume so that both people and parsers can read it.",
+   "date": "2026-11-11",
+   "sections": [
+    {
+     "h": "How long should it be",
+     "p": [
+      "For students and people with a few years of experience, one page is usually enough and forces you to keep only what matters. Two pages are reasonable when you have many years of relevant experience or a long list of projects and publications. Going over two pages rarely helps, because most of the extra detail is not read."
+     ]
+    },
+    {
+     "h": "PDF or Word",
+     "p": [
+      "A PDF keeps your layout the same on every device, and modern parsers read text-based PDFs well. The important point is that the PDF contains real text. A PDF made by exporting from a word processor normally does. A PDF made from a screenshot or a scan does not. If an application form specifically asks for a Word file, send that instead and follow their instruction."
+     ]
+    },
+    {
+     "h": "Fonts, sizes and spacing",
+     "p": [
+      "Use a common, readable font at a size between 10 and 12 points for body text, with slightly larger headings. Leave sensible margins and a little space between sections. Dense text with tiny margins is hard to read for people and gives no benefit to parsers."
+     ]
+    },
+    {
+     "h": "Order of sections",
+     "p": [
+      "Put the most relevant information first. If you are a student, lead with education and projects. If you have professional experience, lead with that and move education lower. Skills and certifications are short, so they can sit near the top or the end depending on how important they are for the role."
+     ]
+    },
+    {
+     "h": "Links and contact details",
+     "p": [
+      "Include an email address, a phone number if you are comfortable sharing it, and links to your portfolio and code profile. Write links as visible text so they survive printing, and check that each one opens the page you expect."
+     ]
+    },
+    {
+     "h": "Name the file clearly",
+     "p": [
+      "Save the file with your name and the word resume, for example Asha_Rao_Resume.pdf. It is easy for a recruiter to find among many downloads and looks careful."
+     ]
+    }
+   ]
+  },
+  {
+   "slug": "write-better-project-descriptions",
+   "title": "How to Write Project Descriptions That Show Your Skill",
+   "description": "A simple structure for project write-ups and README files that makes reviewers trust your work.",
+   "date": "2026-11-11",
+   "sections": [
+    {
+     "h": "Lead with the problem",
+     "p": [
+      "Open with one sentence about the problem the project solves. A reviewer who understands the problem can judge your solution. A project described only by its tools, such as a React and Firebase app, tells them nothing about why it matters."
+     ]
+    },
+    {
+     "h": "Say what you did",
+     "p": [
+      "Use plain verbs that describe your own work: built, designed, tested, deployed, reduced. Avoid vague phrases like worked on or was responsible for. If it was a team project, say which part was yours."
+     ]
+    },
+    {
+     "h": "Add evidence",
+     "p": [
+      "Evidence can be small. Examples include the number of users, the time a task now takes, the size of the data set or the number of automated tests. Do not invent numbers. A true small number is more credible than a large guess."
+     ]
+    },
+    {
+     "h": "A good README structure",
+     "p": [
+      "A useful README has a short summary, a screenshot or short recording, how to run the project, the main features, the tools used and what you would improve next. Reviewers often open the README before the code, so it is the first impression of the project."
+     ]
+    },
+    {
+     "h": "Be honest about limits",
+     "p": [
+      "Mention what the project does not do yet. Honest notes about limits and next steps show maturity and give an interviewer an easy topic to discuss."
+     ]
+    },
+    {
+     "h": "Keep descriptions short",
+     "p": [
+      "On a portfolio card, two or three sentences are enough. Put the longer story in the README or a blog post and link to it from the card."
+     ]
+    }
+   ]
+  }
+ ]
+}

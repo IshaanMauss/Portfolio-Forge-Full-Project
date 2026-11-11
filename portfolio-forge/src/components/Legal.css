@@ -24,3 +24,24 @@
   .legal-page { padding-left: 1rem; padding-right: 1rem; }
   .legal-page th, .legal-page td { min-width: 9rem; }
 }
+.site-footer { margin: 3rem auto 0; padding: 1.5rem 1rem 2.5rem; max-width: 900px; text-align: center; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.9rem; }
+.site-footer nav { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; justify-content: center; margin-bottom: 0.75rem; }
+.site-footer a { color: var(--link); text-decoration: none; padding: 0.25rem 0; }
+.site-footer a:hover { text-decoration: underline; }
+.article h2 { margin-top: 1.8rem; }
+.guide-list { list-style: none; padding: 0; display: grid; gap: 1rem; }
+.guide-list li { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem 1.1rem; }
+.guide-list a { font-family: var(--font-display); font-size: 1.15rem; color: var(--link); text-decoration: none; }
+.guide-list p { color: var(--muted); margin: 0.35rem 0 0; }
+.crumbs { font-size: 0.85rem; color: var(--muted); margin-bottom: 1rem; }
+.crumbs a { color: var(--muted); }
+.tool-info { max-width: 760px; margin: 2.5rem auto 0; padding: 0 1rem; }
+.tool-info h2 { font-family: var(--font-display); font-size: 1.3rem; margin: 1.6rem 0 0.5rem; color: var(--link); }
+.tool-info p, .tool-info li { color: var(--text); margin-bottom: 0.5rem; }
+.tool-info ul, .tool-info ol { padding-left: 1.25rem; }
+.home-info { max-width: 760px; margin: 3rem auto 0; padding: 0 1rem; text-align: left; }
+.home-info h2 { font-family: var(--font-display); font-size: 1.4rem; margin: 1.8rem 0 0.6rem; }
+.home-info p, .home-info li { color: var(--muted); margin-bottom: 0.55rem; }
+.home-info ol { padding-left: 1.25rem; }
+.home-info strong { color: var(--text); }
+.home-info a { color: var(--link); }

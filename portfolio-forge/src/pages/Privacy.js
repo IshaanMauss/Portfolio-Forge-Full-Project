@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { SITE_NAME, CONTACT_EMAIL, REPO_URL, LEGAL_UPDATED } from '../utils/site';
 import '../components/Legal.css';
+import Seo from '../seo/Seo';
+import SiteFooter from '../components/SiteFooter';
 
 function Privacy() {
   const contact = CONTACT_EMAIL
@@ -9,8 +11,7 @@ function Privacy() {
     : <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer">our GitHub repository</a>;
   return (
     <main className="legal-page">
-      <title>Privacy Policy | Portfolio Forge</title>
-      <meta name="description" content="What Portfolio Forge stores, why, and how you can export or delete it." />
+      <Seo page="privacy" />
       <h1>Privacy Policy</h1>
       <p className="updated">Last updated {LEGAL_UPDATED}</p>
       <p>{SITE_NAME} is a free, open-source portfolio and resume builder. This page explains, in plain words, what we handle and what we don&apos;t.</p>
@@ -58,7 +59,13 @@ function Privacy() {
       </ul>
 
       <h2>Advertising</h2>
-      <p>This is a free service and may show ads in the future, only on tool and content pages, never inside the editor. If ads are switched on, we will ask for your choice before any non-essential cookie is set, and you can change it later. Advertising partners may process data under their own privacy policies.</p>
+      <p>{SITE_NAME} is free and is supported by advertising on its tool and content pages (for example the ATS checker, PDF editor and guides). Ads never appear inside the account editor. We plan to use Google AdSense. When ads are switched on, Google and its partners may use cookies or similar technologies to show and measure ads, including ads based on your earlier visits to this and other sites.</p>
+      <ul>
+        <li>We ask for your choice before any non-essential cookie is set, and you can change it at any time. If you decline, you will only see non-personalised ads or none.</li>
+        <li>You can manage personalised advertising from Google at <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">adssettings.google.com</a>, or opt out of many third-party vendors at <a href="https://www.aboutads.info" target="_blank" rel="noopener noreferrer">aboutads.info</a>.</li>
+        <li>Learn how Google uses data from sites that use its services at <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">policies.google.com/technologies/partner-sites</a>.</li>
+        <li>Third-party vendors, including Google, use cookies to serve ads based on a user&apos;s prior visits. Advertising partners process data under their own privacy policies.</li>
+      </ul>
 
       <h2>Your rights</h2>
       <p>You can access, correct, export and erase your data. Use the <Link to="/account">Account</Link> page for export and deletion; deletion removes your draft, published copies, uploaded pictures and sign-in record. Backups and logs may keep traces for a short period before they expire. Under India&apos;s Digital Personal Data Protection Act and similar laws (such as GDPR), you may also complain to us or the relevant regulator. Write to {contact}.</p>
@@ -74,6 +81,7 @@ function Privacy() {
 
       <h2>Open source</h2>
       <p>The code is public at <a href={REPO_URL} target="_blank" rel="noopener noreferrer">our repository</a>, so you can check these claims yourself.</p>
+      <SiteFooter />
     </main>
   );
 }

@@ -4,7 +4,8 @@ import { auth, googleProvider } from '../firebase/config';
 import { signInWithPopup } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import Footer from './Footer';
+import SiteFooter from './SiteFooter';
+import Seo from '../seo/Seo';
 import './Legal.css';
 
 // The 3D scene is code-split so it never slows down the editor.
@@ -30,6 +31,7 @@ function Login() {
 
   return (
     <main className="login-container">
+      <Seo page="home" />
       <div className="aurora" aria-hidden="true" />
       <section className="hero-landing">
         <div className="hero-copy">
@@ -61,8 +63,21 @@ function Login() {
           <Link to="/tools/pdf" className="tool-link tilt"><strong>PDF editor</strong><span>Merge, reorder, rotate, add text and sign. Private by design.</span></Link>
         </div>
       </section>
-      <p className="legal-links"><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><a href="https://github.com/IshaanMauss/Portfolio-Forge-Full-Project" target="_blank" rel="noopener noreferrer">Source code</a></p>
-      <Footer />
+      <section className="home-info">
+        <h2>How Portfolio Forge works</h2>
+        <ol>
+          <li><strong>Sign in with Google.</strong> No card and no paywall.</li>
+          <li><strong>Fill in your details once.</strong> Import projects from your public GitHub repositories or an existing resume PDF, and polish wording with optional AI suggestions.</li>
+          <li><strong>Create a version for each goal.</strong> Choose which sections show on your portfolio and on your resume.</li>
+          <li><strong>Publish and share.</strong> Get a public link and download a text-based PDF resume that applicant tracking systems can read.</li>
+        </ol>
+        <h2>Frequently asked questions</h2>
+        <p><strong>Is it really free?</strong> Yes. The editor and tools are free and open source. To cover hosting, the free tools and guide pages may show ads in future, never inside the editor.</p>
+        <p><strong>Who can see my portfolio?</strong> Only you can see your draft. Only the version you click Save &amp; Publish on becomes public, and sections you hide are removed first.</p>
+        <p><strong>Can I delete my data?</strong> Yes. Export or permanently delete everything from your account page at any time.</p>
+        <p><strong>Will the resume pass an ATS?</strong> The PDF is real text in a single column, which parsers read well. Use the <Link to="/tools/ats">ATS checker</Link> to test any resume, and read our <Link to="/guides">guides</Link> for advice on resumes and portfolios.</p>
+      </section>
+      <SiteFooter />
     </main>
   );
 }

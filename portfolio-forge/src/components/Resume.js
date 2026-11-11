@@ -5,6 +5,7 @@ import { safeUrl } from '../utils/escape';
 import ToggleSwitch from './ToggleSwitch';
 import './Resume.css';
 import { toast } from 'react-toastify';
+import Seo from '../seo/Seo';
 
 function Resume() {
   const { userId, versionId } = useParams();
@@ -127,7 +128,7 @@ function Resume() {
 
   return (
     <>
-      <title>{`${userName || 'Resume'} – Resume`}</title>
+      <Seo title={`${userName || 'Resume'} – Resume`} path="/resume" noindex />
       <div className="resume-actions">
         <div className="theme-toggle-wrapper">
           <ToggleSwitch label="Apply Portfolio Theme" checked={applyTheme} onChange={() => setApplyTheme(!applyTheme)} />
