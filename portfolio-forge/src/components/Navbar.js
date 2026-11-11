@@ -145,7 +145,7 @@ function Navbar({ user, handleSave, unpublished, portfolioData, setPortfolioData
                 </li>
                 )}
                 <li className="nav-item"><button onClick={() => { setShareOpen(true); setMenuOpen(false); }} className="nav-link-button">Share</button></li>
-                <li className="nav-item"><Link to={`/p/${user.uid}/${activePortfolio}`} className="nav-link" onClick={() => setMenuOpen(false)}>Public View</Link></li>
+                <li className="nav-item"><Link to={`/p/${user.uid}/${activePortfolio}`} className="nav-link" onClick={() => { setMenuOpen(false); if (unpublished) toast.info('You have unpublished changes. Press Save & Publish to update the public page.'); }}>Public View</Link></li>
                 <li className="nav-item"><Link to={`/resume/${user.uid}/${activePortfolio}`} className="nav-link" onClick={() => setMenuOpen(false)}>Web Resume</Link></li>
               </>
             )}

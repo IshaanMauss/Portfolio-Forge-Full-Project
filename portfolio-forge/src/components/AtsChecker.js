@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { scoreResume } from '../utils/ats';
+import { useFileDrop } from '../utils/useFileDrop';
 import { extractPdf, MAX_PDF_BYTES } from '../utils/pdfText';
 import { parseResume } from '../utils/resumeImport';
 import './Tools.css';
@@ -54,13 +55,14 @@ function AtsChecker() {
   const parsed = useMemo(() => (doc ? parseResume(doc.lines) : null), [doc]);
   const delta = previous && result ? result.score - previous.score : null;
 
-  const onFile = (e) => {
-    const f = e.target.files?.[0];
+  const takeFile = (f) => {
     if (!f) return;
     if (f.type !== 'application/pdf' && !f.name.toLowerCase().endsWith('.pdf')) { setError('Please choose a PDF file.'); return; }
     if (f.size > MAX_PDF_BYTES) { setError('That PDF is larger than 10 MB.'); return; }
     setFile(f); analyse(f);
   };
+  const onFile = (e) => { takeFile(e.target.files?.[0]); e.target.value = ''; };
+  const { dragging, dropProps } = useFileDrop((fs) => takeFile(fs[0]));
 
   return (
     <main className="tool-page">
@@ -73,10 +75,10 @@ function AtsChecker() {
       </header>
 
       <section className="tool-card rise" style={{ '--d': '80ms' }}>
-        <label className="dropzone">
+        <label className={`dropzone${dragging ? ' is-dragging' : ''}`} {...dropProps}>
           <input type="file" accept="application/pdf,.pdf" onChange={onFile} />
           <span className="dz-icon" aria-hidden="true">⬆</span>
-          <strong>{file ? file.name : 'Choose your resume PDF'}</strong>
+          <strong>{dragging ? 'Drop your PDF here' : file ? file.name : 'Choose or drag & drop your resume PDF'}</strong>
           <small>{busy ? 'Reading…' : 'Max 10 MB · text-based PDFs work best'}</small>
         </label>
         <label className="jd-label" htmlFor="jd">Paste a job description <em>(optional, adds keyword matching)</em></label>

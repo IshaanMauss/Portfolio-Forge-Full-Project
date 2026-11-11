@@ -3,8 +3,10 @@ export const MAX_PDF_BYTES = 10 * 1024 * 1024;
 
 export async function loadPdfJs() {
   const pdfjs = await import('pdfjs-dist/build/pdf');
+  // The worker is served untouched from /public. Letting webpack bundle it injects `require()` calls
+  // that no browser can run, which made every PDF fail to open.
   if (!pdfjs.GlobalWorkerOptions.workerSrc) {
-    pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.js', import.meta.url).toString();
+    pdfjs.GlobalWorkerOptions.workerSrc = `${process.env.PUBLIC_URL || ''}/pdf.worker.3.11.174.min.js`;
   }
   return pdfjs;
 }

@@ -61,3 +61,10 @@
 .parse-table .conf { color: var(--muted); text-align: right; white-space: nowrap; }
 .not-found { color: var(--danger); font-weight: 600; }
 .chip.warn { border-color: var(--cta); color: var(--cta); }
+
+/* Drag and drop */
+.dropzone.is-dragging { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 14%, transparent); transform: scale(1.01); }
+.pe-drop { position: relative; }
+.pe-drop.is-dragging { outline: 2px dashed var(--primary); outline-offset: -6px; }
+.pe-drop-hint { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; font-weight: 700; font-size: 1.1rem; background: color-mix(in srgb, var(--surface) 88%, transparent); border-radius: inherit; pointer-events: none; }
+.pe-empty { margin: 0.75rem 0 0; }

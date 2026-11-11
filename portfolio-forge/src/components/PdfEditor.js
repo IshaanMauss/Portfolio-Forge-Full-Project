@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import { loadPdfJs, MAX_PDF_BYTES } from '../utils/pdfText';
+import { useFileDrop } from '../utils/useFileDrop';
 import { buildPdf } from '../utils/pdfEdit';
 import './Tools.css';
 
@@ -74,7 +75,9 @@ function PdfEditor() {
   useEffect(() => () => { docsRef.current.forEach((d) => d.destroy()); }, []);
 
   const addFiles = useCallback(async (fileList) => {
-    const files = [...fileList];
+    const all = [...fileList];
+    const files = all.filter((f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+    if (files.length < all.length) toast.warn('Only PDF files can be added.');
     if (!files.length) return;
     setBusy(true);
     try {
@@ -103,6 +106,8 @@ function PdfEditor() {
   const cur = pages[idx];
   const patch = (key, fn) => setPages((ps) => ps.map((p) => (p.key === key ? fn(p) : p)));
   const move = (d) => setPages((ps) => { const i = ps.findIndex((p) => p.key === sel); const j = i + d; if (i < 0 || j < 0 || j >= ps.length) return ps; const c = [...ps]; [c[i], c[j]] = [c[j], c[i]]; return c; });
+  const { dragging, dropProps } = useFileDrop((fs) => addFiles(fs), { multiple: true });
+
   const remove = () => { if (!cur) return; setPages((ps) => ps.filter((p) => p.key !== sel)); setSel(pages[idx + 1]?.key || pages[idx - 1]?.key || null); };
 
   const place = (e) => {
@@ -152,7 +157,9 @@ function PdfEditor() {
         <p>Merge files, reorder or rotate pages, add text and sign. It all happens in your browser, so your PDF is never uploaded.</p>
       </header>
 
-      <section className="tool-card rise" style={{ '--d': '80ms' }}>
+      <section className={`tool-card rise pe-drop${dragging ? ' is-dragging' : ''}`} style={{ '--d': '80ms' }} {...dropProps}>
+        {dragging && <div className="pe-drop-hint" aria-hidden="true">Drop PDF files to add them</div>}
+        {!pages.length && <p className="muted pe-empty">Drag &amp; drop PDF files anywhere in this box, or use &ldquo;Open PDF(s)&rdquo;.</p>}
         <div className="pe-toolbar">
           <label className="pe-btn primary" style={{ cursor: 'pointer' }}>
             {pages.length ? 'Add more PDFs' : 'Open PDF(s)'}

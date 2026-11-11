@@ -40,6 +40,17 @@ function PublicPortfolio() {
 
   const formatUrl = safeUrl;
 
+  // Paint the whole viewport in the portfolio's own colours (not just the centred column), and
+  // restore the app background when leaving the page.
+  const pageBg = safeColor(portfolioData?.theme?.backgroundColor, '');
+  useEffect(() => {
+    if (!pageBg) return undefined;
+    const prev = document.body.style.backgroundColor;
+    document.body.style.backgroundColor = pageBg;
+    document.documentElement.style.backgroundColor = pageBg;
+    return () => { document.body.style.backgroundColor = prev; document.documentElement.style.backgroundColor = ''; };
+  }, [pageBg]);
+
   const isFutureYear = (year) => {
     if (!year || isNaN(year)) return false;
     const currentYear = new Date().getFullYear();
