@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
-import { loadPdfJs, MAX_PDF_BYTES } from '../utils/pdfText';
+import { loadPdfJs, looksLikePdf, MAX_PDF_BYTES } from '../utils/pdfText';
 import { useFileDrop } from '../utils/useFileDrop';
 import { buildPdf } from '../utils/pdfEdit';
 import './Tools.css';
@@ -76,7 +76,8 @@ function PdfEditor() {
 
   const addFiles = useCallback(async (fileList) => {
     const all = [...fileList];
-    const files = all.filter((f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf'));
+    const checks = await Promise.all(all.map((f) => looksLikePdf(f)));
+    const files = all.filter((_, i) => checks[i]);
     if (files.length < all.length) toast.warn('Only PDF files can be added.');
     if (!files.length) return;
     setBusy(true);

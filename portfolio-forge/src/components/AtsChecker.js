@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { scoreResume } from '../utils/ats';
 import { useFileDrop } from '../utils/useFileDrop';
-import { extractPdf, MAX_PDF_BYTES } from '../utils/pdfText';
+import { extractPdf, looksLikePdf, MAX_PDF_BYTES } from '../utils/pdfText';
 import { parseResume } from '../utils/resumeImport';
 import './Tools.css';
 
@@ -55,9 +55,9 @@ function AtsChecker() {
   const parsed = useMemo(() => (doc ? parseResume(doc.lines) : null), [doc]);
   const delta = previous && result ? result.score - previous.score : null;
 
-  const takeFile = (f) => {
+  const takeFile = async (f) => {
     if (!f) return;
-    if (f.type !== 'application/pdf' && !f.name.toLowerCase().endsWith('.pdf')) { setError('Please choose a PDF file.'); return; }
+    if (!(await looksLikePdf(f))) { setError('That does not look like a PDF file.'); return; }
     if (f.size > MAX_PDF_BYTES) { setError('That PDF is larger than 10 MB.'); return; }
     setFile(f); analyse(f);
   };

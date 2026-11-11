@@ -1,6 +1,19 @@
 // Extract text + a few layout signals from a PDF, entirely in the browser (nothing is uploaded).
 export const MAX_PDF_BYTES = 10 * 1024 * 1024;
 
+// A file is a PDF if it starts with "%PDF-", whatever its name or MIME type says. Real-world files are
+// often saved without an extension (e.g. "Resume_") or reported as application/octet-stream.
+export async function looksLikePdf(file) {
+  if (!file) return false;
+  try {
+    const head = new Uint8Array(await file.slice(0, 1024).arrayBuffer());
+    const text = String.fromCharCode(...head);
+    return text.includes('%PDF-');
+  } catch (e) {
+    return false;
+  }
+}
+
 export async function loadPdfJs() {
   const pdfjs = await import('pdfjs-dist/build/pdf');
   // The worker is served untouched from /public. Letting webpack bundle it injects `require()` calls
