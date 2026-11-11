@@ -2,16 +2,11 @@
 // It is NOT the score of any real ATS vendor: it checks the common reasons parsers
 // and recruiters drop a resume, and says so in the UI.
 
+import { splitSections } from './resumeImport';
+
 const ACTION_VERBS = new Set(['built','led','designed','developed','created','improved','increased','reduced','launched','managed','implemented','optimized','delivered','automated','analyzed','engineered','shipped','migrated','mentored','owned','drove','established','streamlined','architected','scaled','achieved','resolved','coordinated','negotiated','researched','founded','trained','wrote','deployed','integrated','refactored','secured','tested','maintained','collaborated','organized','presented','won']);
 const STOPWORDS = new Set(('a an and are as at be but by for from has have in into is it its of on or our that the their this to was were will with you your we they he she i not can may must should about across using use used within per via such than then also etc more most other any all each both over under out up new strong ability experience experienced work working years year team teams role roles looking required requirements preferred responsibilities skills knowledge understanding good great excellent plus including include etc job candidate company').split(' '));
 
-const SECTIONS = {
-  experience: /^(work\s+)?(professional\s+)?(experience|employment|work history|internships?)\b/i,
-  education: /^(education|academic|qualifications?)\b/i,
-  skills: /^(technical\s+)?(skills|technologies|tech stack|core competencies)\b/i,
-  projects: /^(projects?|personal projects?|key projects?)\b/i,
-  summary: /^(summary|profile|objective|about me)\b/i,
-};
 
 const EMAIL = /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i;
 const PHONE = /(\+?\d[\d\s().-]{8,}\d)/;
@@ -34,6 +29,21 @@ export function jobKeywords(jd, limit = 25) {
     .sort((a, b) => b[1] - a[1] || b[0].length - a[0].length)
     .slice(0, limit)
     .map(([w]) => w);
+}
+
+// Two-word phrases that repeat in the job description (e.g. "machine learning", "rest api").
+export function jobPhrases(jd, limit = 8) {
+  const counts = new Map();
+  jd.toLowerCase().split(/[.,;:()\n/!?]+/).forEach((chunk) => {
+    const words = (chunk.match(/[a-z][a-z0-9+#]*/g) || []);
+    for (let i = 0; i < words.length - 1; i += 1) {
+      const [a, b] = [words[i], words[i + 1]];
+      if (a.length < 2 || b.length < 2 || STOPWORDS.has(a) || STOPWORDS.has(b)) continue;
+      const p = `${a} ${b}`;
+      counts.set(p, (counts.get(p) || 0) + 1);
+    }
+  });
+  return [...counts.entries()].filter(([, n]) => n >= 2).sort((x, y) => y[1] - x[1]).slice(0, limit).map(([p]) => p);
 }
 
 const check = (id, label, weight, score, detail, tip) => ({
@@ -67,8 +77,9 @@ export function scoreResume(doc, jobDescription = '') {
     'Put email, phone and a LinkedIn or GitHub link in the page body, not only in a header/footer.'));
 
   // 3. Standard section headings.
+  const secs = splitSections(lines);
   const found = {};
-  lines.forEach((l) => { Object.entries(SECTIONS).forEach(([k, re]) => { if (l.length < 40 && re.test(l.replace(/[^A-Za-z ]/g, ' ').trim())) found[k] = true; }); });
+  ['experience', 'education', 'skills', 'projects', 'summary'].forEach((k) => { if (secs[k]) found[k] = true; });
   const must = ['experience', 'education', 'skills'].filter((k) => found[k]).length;
   const bonus = (found.projects || found.summary) ? 0.1 : 0;
   checks.push(check('sections', 'Standard section headings', 15, must / 3 + bonus,
@@ -115,14 +126,24 @@ export function scoreResume(doc, jobDescription = '') {
   // 10. Job description match (optional).
   let keywords = null;
   if (jobDescription.trim().length > 40) {
-    const want = jobKeywords(jobDescription);
+    const phrases = jobPhrases(jobDescription);
+    const covered = new Set(phrases.flatMap((p) => p.split(' ')));
+    const want = [...phrases, ...jobKeywords(jobDescription).filter((k) => !covered.has(k))].slice(0, 28);
     const have = new Set(tokenize(text));
-    const matched = want.filter((k) => have.has(k));
-    const missing = want.filter((k) => !have.has(k));
-    keywords = { total: want.length, matched, missing };
+    const lower = text.toLowerCase();
+    const found2 = (k) => (k.includes(' ') ? lower.includes(k) : have.has(k));
+    const matched = want.filter(found2);
+    const missing = want.filter((k) => !found2(k));
+    // Evidence: is the term shown in a job/project bullet, or only listed (e.g. in Skills)?
+    const evidenceText = [...(secs.experience || []), ...(secs.projects || [])].join(' ').toLowerCase();
+    const evTokens = new Set(tokenize(evidenceText));
+    const inEvidence = (k) => (k.includes(' ') ? evidenceText.includes(k) : evTokens.has(k));
+    const evidenced = matched.filter(inEvidence);
+    const skillsOnly = matched.filter((k) => !inEvidence(k));
+    keywords = { total: want.length, matched, missing, evidenced, skillsOnly };
     checks.push(check('keywords', 'Job description match', 20, want.length ? matched.length / want.length : 0,
-      `${matched.length} of ${want.length} key terms found.`,
-      'Work the missing terms into your skills and bullets, only where they are true.'));
+      `${matched.length} of ${want.length} key terms found${skillsOnly.length ? `; ${skillsOnly.length} appear only outside your experience/projects` : ''}.`,
+      'Add the missing terms to your skills and, where true, to bullets that show you using them.'));
   }
 
   const totalWeight = checks.reduce((s, c) => s + c.weight, 0);

@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { scoreResume } from '../utils/ats';
 import { extractPdf, MAX_PDF_BYTES } from '../utils/pdfText';
+import { parseResume } from '../utils/resumeImport';
 import './Tools.css';
 
 const ICON = { pass: '✓', warn: '!', fail: '✕' };
@@ -27,11 +28,14 @@ function AtsChecker() {
   const [result, setResult] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [previous, setPrevious] = useState(null);
+  const last = useRef(null);
 
   const analyse = useCallback(async (f) => {
     setBusy(true); setError(''); setResult(null);
     try {
       const parsed = await extractPdf(f);
+      setPrevious(last.current);
       setDoc(parsed);
     } catch (e) {
       setDoc(null);
@@ -40,7 +44,15 @@ function AtsChecker() {
   }, []);
 
   // Re-score instantly when the job description changes (no re-parsing of the PDF).
-  useEffect(() => { if (doc) setResult(scoreResume(doc, jd)); }, [doc, jd]);
+  useEffect(() => {
+    if (!doc) return;
+    const r = scoreResume(doc, jd);
+    setResult(r);
+    last.current = { file: file?.name || 'previous upload', score: r.score, checks: Object.fromEntries(r.checks.map((c) => [c.id, c.score])) };
+  }, [doc, jd]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const parsed = useMemo(() => (doc ? parseResume(doc.lines) : null), [doc]);
+  const delta = previous && result ? result.score - previous.score : null;
 
   const onFile = (e) => {
     const f = e.target.files?.[0];
@@ -78,17 +90,43 @@ function AtsChecker() {
             <ScoreRing score={result.score} grade={result.grade} />
             <div>
               <h2>Estimated ATS readiness</h2>
+              {delta !== null && <p className={`delta ${delta >= 0 ? 'up' : 'down'}`}>{delta > 0 ? `▲ +${delta}` : delta < 0 ? `▼ ${delta}` : '= no change'} compared with {previous.file} ({previous.score})</p>}
               <p className="muted">This is an estimate from common parsing checks, not the score of any specific employer system.</p>
               {!result.hasJobDescription && <p className="muted">Add a job description above to include keyword matching.</p>}
             </div>
           </div>
+
+          {parsed && (
+            <div className="tool-card">
+              <h3>What a parser saw in your resume</h3>
+              <p className="muted">If something here is wrong or empty, an ATS probably misreads it too.</p>
+              <table className="parse-table">
+                <tbody>
+                  {[
+                    ['Name', parsed.name, parsed.confidence.name],
+                    ['Email', parsed.email, parsed.confidence.email],
+                    ['Phone', parsed.phone, parsed.confidence.phone],
+                    ['LinkedIn', parsed.linkedin, parsed.confidence.linkedin],
+                    ['GitHub', parsed.github, parsed.confidence.github],
+                    ['Sections', Object.keys(parsed.sections).filter((k) => !['header', 'other'].includes(k)).join(', '), 0.9],
+                    ['Skills', parsed.skills.length ? `${parsed.skills.length}: ${parsed.skills.slice(0, 6).join(', ')}${parsed.skills.length > 6 ? '…' : ''}` : '', parsed.confidence.skills],
+                    ['Education', [parsed.education.name, parsed.education.gradYear].filter(Boolean).join(' · '), parsed.confidence.education],
+                    ['Experience entries', parsed.experience.length ? String(parsed.experience.length) : '', parsed.confidence.experience],
+                    ['Projects', parsed.projects.length ? String(parsed.projects.length) : '', parsed.confidence.projects],
+                  ].map(([label, val, c]) => (
+                    <tr key={label}><th scope="row">{label}</th><td>{val || <span className="not-found">not found</span>}</td><td className="conf">{val ? `${Math.round((c || 0.5) * 100)}%` : '—'}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           <ul className="check-list">
             {result.checks.map((c, i) => (
               <li key={c.id} className={`check ${c.status} rise`} style={{ '--d': `${i * 50}ms` }}>
                 <span className="check-ico" aria-hidden="true">{ICON[c.status]}</span>
                 <div>
-                  <h3>{c.label} <small>{Math.round(c.score * 100)}%</small></h3>
+                  <h3>{c.label} <small>{Math.round(c.score * 100)}%{previous && previous.checks[c.id] !== undefined && Math.round((c.score - previous.checks[c.id]) * 100) !== 0 ? ` (${c.score > previous.checks[c.id] ? '+' : ''}${Math.round((c.score - previous.checks[c.id]) * 100)})` : ''}</small></h3>
                   <p>{c.detail}</p>
                   {c.tip && <p className="tip">Fix: {c.tip}</p>}
                 </div>
@@ -96,12 +134,17 @@ function AtsChecker() {
             ))}
           </ul>
 
-          {result.keywords && result.keywords.missing.length > 0 && (
+          {result.keywords && (result.keywords.missing.length > 0 || result.keywords.skillsOnly.length > 0) && (
             <div className="tool-card">
               <h3>Missing keywords</h3>
               <div className="chips">{result.keywords.missing.map((k) => <span className="chip miss" key={k}>{k}</span>)}</div>
-              <h3>Matched</h3>
-              <div className="chips">{result.keywords.matched.map((k) => <span className="chip hit" key={k}>{k}</span>)}</div>
+              <h3>Matched and shown in your experience or projects</h3>
+              <div className="chips">{result.keywords.evidenced.map((k) => <span className="chip hit" key={k}>{k}</span>)}</div>
+              {result.keywords.skillsOnly.length > 0 && (<>
+                <h3>Listed, but not backed by a bullet</h3>
+                <p className="muted">Recruiters trust a skill more when a project or job bullet shows it.</p>
+                <div className="chips">{result.keywords.skillsOnly.map((k) => <span className="chip warn" key={k}>{k}</span>)}</div>
+              </>)}
             </div>
           )}
         </section>

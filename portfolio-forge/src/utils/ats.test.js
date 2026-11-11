@@ -1,4 +1,4 @@
-import { scoreResume, jobKeywords } from './ats';
+import { scoreResume, jobKeywords, jobPhrases } from './ats';
 
 const good = `Jane Doe
 jane@doe.com | +91 98765 43210 | linkedin.com/in/janedoe | github.com/janedoe
@@ -39,4 +39,12 @@ test('multi-column layout is penalised', () => {
   const a = scoreResume(docOf(good, { multiColumnRatio: 0.6 }));
   const b = scoreResume(docOf(good));
   expect(a.score).toBeLessThan(b.score);
+});
+
+test('multi-word phrases are matched and evidence is separated from skills-only', () => {
+  const jd = 'You will build a REST API with machine learning models. Machine learning experience and REST API design needed. Kubernetes helps.';
+  expect(jobPhrases(jd)).toEqual(expect.arrayContaining(['machine learning', 'rest api']));
+  const r = scoreResume(docOf(good + '\nmachine learning'), jd);
+  expect(r.keywords.matched).toContain('machine learning');
+  expect(r.keywords.skillsOnly).toContain('machine learning');
 });

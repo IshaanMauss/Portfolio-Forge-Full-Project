@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { auth } from '../firebase/config';
 import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
 import { safeUrl, safeColor } from '../utils/escape';
 import { PORTFOLIO_FONTS, fontQuery } from '../utils/fonts';
+const Constellation3D = lazy(() => import('./Constellation3D'));
 
 
 function PublicPortfolio() {
@@ -69,6 +70,10 @@ function PublicPortfolio() {
           )}
         </div>
       </header>
+
+      {theme.showConstellation && (
+        <Suspense fallback={null}><Constellation3D data={portfolioData} /></Suspense>
+      )}
 
       <div className="main-content-public">
         <main className="main-column-public">

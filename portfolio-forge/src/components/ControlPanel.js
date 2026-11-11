@@ -317,6 +317,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
             </button>
           ))}
         </div>
+        <ToggleSwitch label="3D constellation on my public page" checked={portfolioData.theme?.showConstellation || false} onChange={() => updatePortfolio('theme.showConstellation', !portfolioData.theme?.showConstellation)} />
         <label>Font</label>
         <select value={portfolioData.theme?.font || 'Poppins'} onChange={e => updatePortfolio('theme.font', e.target.value)}>
           {Object.keys(PORTFOLIO_FONTS).map((f) => <option key={f} value={f}>{f}</option>)}

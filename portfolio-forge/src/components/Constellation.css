@@ -1,0 +1,16 @@
+.constellation { margin: 0 0 2.5rem; padding: 0.5rem 0 1rem; text-align: center; }
+.constellation-stage { position: relative; width: 100%; height: min(62vh, 480px); min-height: 300px; border-radius: 16px; overflow: hidden;
+  background: radial-gradient(60% 70% at 50% 45%, color-mix(in srgb, var(--c-accent) 14%, transparent), transparent);
+  border: 1px solid color-mix(in srgb, var(--c-fg) 18%, transparent); }
+.constellation-stage canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; cursor: grab; }
+.constellation-stage canvas:active { cursor: grabbing; }
+.c-label { position: absolute; left: 0; top: 0; pointer-events: none; font-size: 0.72rem; white-space: nowrap; color: var(--c-fg); opacity: 0.8; will-change: transform; text-shadow: 0 1px 6px var(--c-bg); }
+.c-label.me { font-size: 0.95rem; font-weight: 700; color: var(--c-accent); }
+.c-label.project { font-size: 0.82rem; font-weight: 600; color: var(--c-accent); }
+.constellation-hint { font-size: 0.8rem; opacity: 0.65; margin-top: 0.5rem; }
+.constellation-info { margin: 0.6rem auto 0; max-width: 560px; text-align: left; padding: 0.8rem 1rem; border-radius: 12px; background: color-mix(in srgb, var(--c-fg) 8%, transparent); border: 1px solid color-mix(in srgb, var(--c-fg) 20%, transparent); display: flex; flex-direction: column; gap: 0.3rem; }
+.constellation-info a { color: var(--c-accent); margin-right: 1rem; }
+.c-kw { font-size: 0.8rem; opacity: 0.7; }
+.c-download { margin-top: 0.7rem; background: transparent; color: inherit; border: 1px solid color-mix(in srgb, var(--c-fg) 35%, transparent); border-radius: 999px; padding: 0.45rem 1rem; min-height: 40px; cursor: pointer; font-size: 0.85rem; }
+.c-download:hover { border-color: var(--c-accent); color: var(--c-accent); }
+@media (max-width: 760px) { .constellation-stage { height: 340px; } .c-label { font-size: 0.66rem; } }
