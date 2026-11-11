@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { auth } from '../firebase/config';
 import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
 import { safeUrl, safeColor } from '../utils/escape';
@@ -123,7 +123,7 @@ function PublicPortfolio() {
         </aside>
       </div>
       <footer className="pf-badge">
-        <a href="/">Built with Portfolio Forge — create yours free</a>
+        <Link to="/">Built with Portfolio Forge — create yours free</Link>
       </footer>
     </div>
   );

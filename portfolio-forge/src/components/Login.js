@@ -3,6 +3,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { auth, googleProvider } from '../firebase/config';
 import { signInWithPopup } from 'firebase/auth';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 import Footer from './Footer';
 
 // The 3D scene is code-split so it never slows down the editor.
@@ -52,6 +53,13 @@ function Login() {
           </div>
         ))}
       </div>
+      <section className="tools-strip rise" style={{ '--d': '700ms' }}>
+        <h2>Free tools. No login.</h2>
+        <div className="tools-strip-grid">
+          <Link to="/tools/ats" className="tool-link tilt"><strong>ATS resume checker</strong><span>Score your PDF and fix what parsers can't read.</span></Link>
+          <Link to="/tools/pdf" className="tool-link tilt"><strong>PDF editor</strong><span>Merge, reorder, rotate, add text and sign. Private by design.</span></Link>
+        </div>
+      </section>
       <Footer />
     </main>
   );

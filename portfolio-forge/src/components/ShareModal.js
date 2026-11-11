@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 function ShareModal({ url, title, unpublished, onClose }) {
   const [copied, setCopied] = useState(false);
@@ -65,7 +66,7 @@ function ShareModal({ url, title, unpublished, onClose }) {
           {links.map((l) => (
             <a key={l.label} href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>
           ))}
-          <a href={url} target="_blank" rel="noopener noreferrer">Open</a>
+          <Link to={new URL(url).pathname} onClick={onClose}>Open</Link>
         </div>
         <button type="button" className="btn-secondary share-close" onClick={onClose}>Close</button>
       </div>

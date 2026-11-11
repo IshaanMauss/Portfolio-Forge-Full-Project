@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FEATURES } from '../utils/features';
 import { auth } from '../firebase/config';
 import { toast } from 'react-toastify';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -124,10 +125,12 @@ function Navbar({ user, handleSave, unpublished, portfolioData, setPortfolioData
           <Link to="/" className="nav-logo">Portfolio Forge</Link>
         </div>
 
-        {user && (
-          <ul className={`nav-menu${menuOpen ? ' active' : ''}`}>
-            {isDashboard && (
+        <ul className={`nav-menu${menuOpen ? ' active' : ''}`}>
+            <li className="nav-item"><Link to="/tools/ats" className="nav-link" onClick={() => setMenuOpen(false)}>ATS Check</Link></li>
+            <li className="nav-item"><Link to="/tools/pdf" className="nav-link" onClick={() => setMenuOpen(false)}>PDF Editor</Link></li>
+            {user && isDashboard && (
               <>
+                {FEATURES.multiVersion && (
                 <li className="nav-item version-selector">
                   <span className="version-label">Version</span>
                   <select value={activePortfolio} onChange={handleVersionChange} aria-label="Portfolio version">
@@ -140,14 +143,14 @@ function Navbar({ user, handleSave, unpublished, portfolioData, setPortfolioData
                     </button>
                   )}
                 </li>
+                )}
                 <li className="nav-item"><button onClick={() => { setShareOpen(true); setMenuOpen(false); }} className="nav-link-button">Share</button></li>
-                <li className="nav-item"><a href={`/p/${user.uid}/${activePortfolio}`} target="_blank" rel="noopener noreferrer" className="nav-link">Public View</a></li>
-                <li className="nav-item"><a href={`/resume/${user.uid}/${activePortfolio}`} target="_blank" rel="noopener noreferrer" className="nav-link">Web Resume</a></li>
+                <li className="nav-item"><Link to={`/p/${user.uid}/${activePortfolio}`} className="nav-link" onClick={() => setMenuOpen(false)}>Public View</Link></li>
+                <li className="nav-item"><Link to={`/resume/${user.uid}/${activePortfolio}`} className="nav-link" onClick={() => setMenuOpen(false)}>Web Resume</Link></li>
               </>
             )}
-            <li className="nav-item"><button onClick={handleSignOut} className="nav-link-button">Sign Out</button></li>
-          </ul>
-        )}
+            {user && <li className="nav-item"><button onClick={handleSignOut} className="nav-link-button">Sign Out</button></li>}
+        </ul>
 
         <div className="nav-right">
           <ThemeSwitcher />
@@ -160,7 +163,7 @@ function Navbar({ user, handleSave, unpublished, portfolioData, setPortfolioData
               Save &amp; Publish{unpublished ? ' •' : ''}
             </button>
           )}
-          {user && (
+          {(
             <button
               type="button"
               className="menu-icon"

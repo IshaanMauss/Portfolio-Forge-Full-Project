@@ -16,6 +16,8 @@ import './App.css';
 // heavy PDF libraries are only fetched when actually needed.
 const PublicPortfolio = lazy(() => import('./components/PublicPortfolio'));
 const Resume = lazy(() => import('./components/Resume'));
+const AtsChecker = lazy(() => import('./components/AtsChecker'));
+const PdfEditor = lazy(() => import('./components/PdfEditor'));
 
 const AUTOSAVE_DELAY_MS = 3000;
 
@@ -271,6 +273,8 @@ function App() {
               )
             }
           />
+          <Route path="/tools/ats" element={<AtsChecker />} />
+          <Route path="/tools/pdf" element={<PdfEditor />} />
           <Route path="/p/:userId/:versionId?" element={<PublicPortfolio />} />
           <Route path="/resume/:userId/:versionId?" element={<Resume />} />
         </Routes>
