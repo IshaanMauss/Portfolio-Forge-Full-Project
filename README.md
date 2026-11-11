@@ -13,6 +13,16 @@ ATS-friendly PDF resume.
 * Text-based PDF (browser print) plus a quick image PDF fallback
 * AI bio/project polish (Cloudflare Workers AI) with login + daily limits
 
+## Free tools (no login, run in your browser)
+
+* **ATS resume checker** (`/tools/ats`): estimates parser-friendliness and job-description keyword match
+* **PDF editor** (`/tools/pdf`): merge, reorder, rotate, add text, sign. Files never leave your device
+* Account page: export or permanently delete your data. Privacy and Terms pages included
+
+> Multiple portfolio versions are implemented but paused in the UI (`src/utils/features.js`).
+
+See `docs/ARCHITECTURE.md`, `docs/COMPLIANCE.md` and `SECURITY.md`.
+
 ## Architecture & security model
 
 | Data | Location | Who can read | Who can write |

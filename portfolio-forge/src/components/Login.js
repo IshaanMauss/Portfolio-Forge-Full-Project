@@ -5,6 +5,7 @@ import { signInWithPopup } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import Footer from './Footer';
+import './Legal.css';
 
 // The 3D scene is code-split so it never slows down the editor.
 const Hero3D = lazy(() => import('./Hero3D'));
@@ -60,6 +61,7 @@ function Login() {
           <Link to="/tools/pdf" className="tool-link tilt"><strong>PDF editor</strong><span>Merge, reorder, rotate, add text and sign. Private by design.</span></Link>
         </div>
       </section>
+      <p className="legal-links"><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><a href="https://github.com/IshaanMauss/Portfolio-Forge-Full-Project" target="_blank" rel="noopener noreferrer">Source code</a></p>
       <Footer />
     </main>
   );

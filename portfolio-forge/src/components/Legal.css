@@ -1,0 +1,19 @@
+.legal-page { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.1rem 6rem; }
+.legal-page h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 2.8rem); line-height: 1.1; margin-bottom: 0.4rem; }
+.legal-page .updated { color: var(--muted); margin-bottom: 2rem; }
+.legal-page h2 { font-family: var(--font-display); font-size: 1.35rem; margin: 2rem 0 0.5rem; color: var(--link); }
+.legal-page p, .legal-page li { color: var(--text); margin-bottom: 0.6rem; }
+.legal-page ul { padding-left: 1.25rem; }
+.legal-page a { color: var(--link); }
+.legal-page table { width: 100%; border-collapse: collapse; margin: 0.8rem 0; font-size: 0.92rem; display: block; overflow-x: auto; }
+.legal-page th, .legal-page td { text-align: left; padding: 0.55rem 0.7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+.legal-page th { color: var(--muted); }
+.consent { position: fixed; left: 0.75rem; right: 0.75rem; bottom: 0.75rem; z-index: 1200; max-width: 640px; margin: 0 auto; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.9rem 1rem; box-shadow: var(--shadow); animation: rise 0.4s ease both; }
+.consent p { flex: 1 1 260px; font-size: 0.92rem; }
+.consent a { color: var(--link); }
+.consent-actions { display: flex; gap: 0.5rem; }
+.legal-links { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; font-size: 0.9rem; }
+.legal-links a { color: var(--muted); }
+.account-danger { border-color: color-mix(in srgb, var(--danger) 60%, var(--border)); }
+.account-danger input { max-width: 260px; }
+.pe-btn.danger { background: var(--danger); color: var(--on-danger); border-color: transparent; }

@@ -6,6 +6,7 @@ import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from './components/Navbar';
+import ConsentBanner from './components/ConsentBanner';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
 import { publishAll, hasPublished } from './utils/publish';
@@ -18,6 +19,9 @@ const PublicPortfolio = lazy(() => import('./components/PublicPortfolio'));
 const Resume = lazy(() => import('./components/Resume'));
 const AtsChecker = lazy(() => import('./components/AtsChecker'));
 const PdfEditor = lazy(() => import('./components/PdfEditor'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Terms = lazy(() => import('./pages/Terms'));
+const Account = lazy(() => import('./pages/Account'));
 
 const AUTOSAVE_DELAY_MS = 3000;
 
@@ -241,6 +245,7 @@ function App() {
   return (
     <>
       <ToastContainer position="bottom-right" autoClose={4000} theme="dark" />
+      <ConsentBanner />
       <Navbar
         user={user}
         handleSave={handleSave}
@@ -273,6 +278,9 @@ function App() {
               )
             }
           />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/account" element={<Account user={user} />} />
           <Route path="/tools/ats" element={<AtsChecker />} />
           <Route path="/tools/pdf" element={<PdfEditor />} />
           <Route path="/p/:userId/:versionId?" element={<PublicPortfolio />} />
