@@ -72,7 +72,7 @@ const createDefaultData = (currentUser) => ({
       projects: { showOnPage: true, items: [] },
       blogPosts: { showOnPage: false, items: [] },
       customSections: { title: 'Custom Section', showOnPage: false, items: [] },
-      theme: { font: 'Poppins', backgroundColor: '#0a192f', textColor: '#ccd6f6', accentColor: '#64ffda', layout: 'standard' },
+      theme: { font: 'Poppins', backgroundColor: '#2b1338', textColor: '#f6ecf5', accentColor: '#e9b6da', layout: 'standard' },
     },
   },
 });

@@ -136,7 +136,7 @@ function Resume() {
       </div>
       <div id="resume-content" className={`resume-container ${applyTheme ? 'theme-applied' : ''}`} style={applyTheme ? dynamicStyles : {}}>
         <header className="resume-header">
-          {imageToDisplay && <img id="resume-profile-pic" src={imageToDisplay} alt="Profile" crossOrigin="anonymous" className="profile-pic-resume" />}
+          {imageToDisplay && <img id="resume-profile-pic" src={imageToDisplay} alt="Profile" referrerPolicy="no-referrer" crossOrigin="anonymous" className="profile-pic-resume" />}
           <h1>{userName}</h1>
           <p className="subtitle">{userSubtitle}</p>
           <div className="contact-info">

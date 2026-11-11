@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { PORTFOLIO_FONTS } from '../utils/fonts';
 import { auth, storage } from '../firebase/config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-toastify';
@@ -150,7 +151,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <summary><h3>Profile & Contact</h3></summary>
         <label>Profile Picture</label>
         <div className="profile-pic-area">
-          {portfolioData.profilePicUrl && <img src={portfolioData.profilePicUrl} alt="Profile Preview" className="profile-pic-preview" />}
+          {portfolioData.profilePicUrl && <img src={portfolioData.profilePicUrl} alt="Profile Preview" className="profile-pic-preview" referrerPolicy="no-referrer" />}
           <input type="file" accept="image/png,image/jpeg,image/webp" onChange={handleProfilePicUpload} disabled={isUploading} />
           {isUploading && <p>Uploading...</p>}
         </div>
@@ -314,6 +315,10 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
             </button>
           ))}
         </div>
+        <label>Font</label>
+        <select value={portfolioData.theme?.font || 'Poppins'} onChange={e => updatePortfolio('theme.font', e.target.value)}>
+          {Object.keys(PORTFOLIO_FONTS).map((f) => <option key={f} value={f}>{f}</option>)}
+        </select>
         <label>Layout Template</label>
         <select value={portfolioData.theme?.layout || 'standard'} onChange={e => updatePortfolio('theme.layout', e.target.value)}>
           <option value="standard">Standard (Two-Column)</option>

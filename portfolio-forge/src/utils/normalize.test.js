@@ -32,3 +32,13 @@ test('never drops portfolio content that exists', () => {
   data.meta.versions = [{ id: 'default', name: 'Main' }];
   expect(normalizeData(data).portfolios.v_1).toBeDefined();
 });
+
+test('migrates only the untouched old default theme', () => {
+  const data = base();
+  data.portfolios.default.theme = { backgroundColor: '#0a192f', textColor: '#ccd6f6', accentColor: '#64ffda', layout: 'compact' };
+  data.portfolios.v_1.theme = { backgroundColor: '#123456', textColor: '#ccd6f6', accentColor: '#64ffda' };
+  const out = normalizeData(data);
+  expect(out.portfolios.default.theme.backgroundColor).toBe('#2b1338');
+  expect(out.portfolios.default.theme.layout).toBe('compact');
+  expect(out.portfolios.v_1.theme.backgroundColor).toBe('#123456');
+});

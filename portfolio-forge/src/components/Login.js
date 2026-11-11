@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { auth, googleProvider } from '../firebase/config';
 import { signInWithPopup } from 'firebase/auth';
 import { toast } from 'react-toastify';
 import Footer from './Footer';
+
+// The 3D scene is code-split so it never slows down the editor.
+const Hero3D = lazy(() => import('./Hero3D'));
 
 const FEATURES = [
   { title: 'Many versions, one place', text: 'Keep a separate portfolio for each goal: jobs, freelance, college, a side project.' },
@@ -25,16 +28,25 @@ function Login() {
 
   return (
     <main className="login-container">
-      <span className="login-badge">Free · Open source</span>
-      <h1>Build a portfolio for every goal.</h1>
-      <p>Create, tailor and share your portfolio and resume in minutes.</p>
-      <button type="button" onClick={handleLogin} className="login-button google-btn">
-        <FcGoogle size={22} aria-hidden="true" />
-        Continue with Google
-      </button>
+      <div className="aurora" aria-hidden="true" />
+      <section className="hero-landing">
+        <div className="hero-copy">
+          <span className="login-badge rise" style={{ '--d': '0ms' }}>Free · Open source</span>
+          <h1 className="rise" style={{ '--d': '80ms' }}>Build a portfolio for <em>every</em> goal.</h1>
+          <p className="rise" style={{ '--d': '160ms' }}>Create, tailor and share your portfolio and resume in minutes. One account, many versions, made for every screen.</p>
+          <button type="button" onClick={handleLogin} className="login-button google-btn rise" style={{ '--d': '240ms' }}>
+            <FcGoogle size={22} aria-hidden="true" />
+            Continue with Google
+          </button>
+          <p className="hero-note rise" style={{ '--d': '300ms' }}>No card. No paywall. Your data stays yours.</p>
+        </div>
+        <div className="hero-visual rise" style={{ '--d': '200ms' }}>
+          <Suspense fallback={null}><Hero3D /></Suspense>
+        </div>
+      </section>
       <div className="feature-grid">
-        {FEATURES.map((f) => (
-          <div className="feature-card" key={f.title}>
+        {FEATURES.map((f, i) => (
+          <div className="feature-card tilt rise" style={{ '--d': `${360 + i * 80}ms` }} key={f.title}>
             <h3>{f.title}</h3>
             <p>{f.text}</p>
           </div>

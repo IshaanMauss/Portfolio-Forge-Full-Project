@@ -1,9 +1,11 @@
 import React from 'react';
 import { escapeHtml as e, safeUrl, safeColor } from '../utils/escape';
+import { PORTFOLIO_PALETTES } from '../utils/palettes';
+import { PORTFOLIO_FONTS, fontQuery } from '../utils/fonts';
 
-const FONTS = ['Poppins', 'Roboto Slab', 'Lato'];
+const FONTS = Object.keys(PORTFOLIO_FONTS);
 
-function PreviewPanel({ portfolioData }) {
+function PreviewPanel({ portfolioData, updatePortfolio }) {
   if (!portfolioData) {
     return <main className="preview-panel"><div>Loading Preview...</div></main>;
   }
@@ -67,12 +69,12 @@ function PreviewPanel({ portfolioData }) {
   const previewContent = `
     <html>
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Roboto+Slab&family=Lato&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=${fontQuery(font)}&display=swap" rel="stylesheet">
         ${styles}
       </head>
       <body>
         <header class="header section">
-          ${picUrl ? `<img src="${e(picUrl)}" alt="Profile" class="profile-pic">` : ''}
+          ${picUrl ? `<img src="${e(picUrl)}" alt="Profile" class="profile-pic" referrerpolicy="no-referrer">` : ''}
           <h1>${e(userName)}</h1><h2 class="accent">${e(userSubtitle)}</h2>
           ${location?.showOnPage ? `<p>${e(location.value)}</p>` : ''}
         </header>
@@ -101,6 +103,30 @@ function PreviewPanel({ portfolioData }) {
   // through escaping, it could not touch the app or the user's session.
   return (
     <main className="preview-panel">
+      {updatePortfolio && (
+        <div className="preview-palettes" role="group" aria-label="Portfolio colour presets">
+          <span className="preview-palettes-label">Colours</span>
+          {PORTFOLIO_PALETTES.map((pal) => {
+            const active = (theme.backgroundColor || '').toLowerCase() === pal.backgroundColor && (theme.accentColor || '').toLowerCase() === pal.accentColor;
+            return (
+              <button
+                key={pal.id}
+                type="button"
+                className={`palette-dot${active ? ' active' : ''}`}
+                title={pal.name}
+                aria-label={`${pal.name} colours`}
+                aria-pressed={active}
+                style={{ background: `linear-gradient(135deg, ${pal.backgroundColor} 50%, ${pal.accentColor} 50%)` }}
+                onClick={() => {
+                  updatePortfolio('theme.backgroundColor', pal.backgroundColor);
+                  updatePortfolio('theme.textColor', pal.textColor);
+                  updatePortfolio('theme.accentColor', pal.accentColor);
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
       <iframe id="portfolio-preview" sandbox="" srcDoc={previewContent} title="Portfolio Preview"></iframe>
     </main>
   );

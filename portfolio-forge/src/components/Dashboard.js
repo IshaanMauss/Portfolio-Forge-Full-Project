@@ -19,7 +19,7 @@ function Dashboard({ portfolioData, updatePortfolio }) {
       </div>
       <div className={`panels-container show-${tab}`}>
         <ControlPanel portfolioData={portfolioData} updatePortfolio={updatePortfolio} />
-        <PreviewPanel portfolioData={portfolioData} />
+        <PreviewPanel portfolioData={portfolioData} updatePortfolio={updatePortfolio} />
       </div>
       <Footer />
     </>

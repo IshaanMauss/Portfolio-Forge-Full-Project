@@ -3,12 +3,8 @@ import { useParams } from 'react-router-dom';
 import { auth } from '../firebase/config';
 import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
 import { safeUrl, safeColor } from '../utils/escape';
+import { PORTFOLIO_FONTS, fontQuery } from '../utils/fonts';
 
-const FONT_CSS = {
-  Poppins: 'Poppins:wght@400;600;700',
-  'Roboto Slab': 'Roboto+Slab:wght@400;700',
-  Lato: 'Lato:wght@400;700',
-};
 
 function PublicPortfolio() {
   const { userId, versionId } = useParams();
@@ -39,7 +35,7 @@ function PublicPortfolio() {
   // --- THE FIX: Check if there's at least one link to show the contact section ---
   const showContactSection = links?.email || links?.linkedin || links?.github;
 
-  const font = FONT_CSS[theme.font] ? theme.font : 'Poppins';
+  const font = PORTFOLIO_FONTS[theme.font] ? theme.font : 'Poppins';
   const containerStyle = {
     backgroundColor: safeColor(theme.backgroundColor, '#0a192f'),
     color: safeColor(theme.textColor, '#ccd6f6'),
@@ -54,10 +50,10 @@ function PublicPortfolio() {
       <meta property="og:title" content={`${userName || 'Portfolio'}${userSubtitle ? ' – ' + userSubtitle : ''}`} />
       <meta property="og:description" content={(bio || '').slice(0, 160)} />
       <meta property="og:type" content="profile" />
-      <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${FONT_CSS[font]}&display=swap`} precedence="default" />
+      <link rel="stylesheet" href={`https://fonts.googleapis.com/css2?family=${fontQuery(font)}&display=swap`} precedence="default" />
       <header className="hero-public">
         <div className="hero-main-content">
-          {profilePicUrl && <img src={profilePicUrl} alt="Profile" className="profile-pic-public" style={{ borderColor: theme.accentColor }}/>}
+          {profilePicUrl && <img src={profilePicUrl} alt="Profile" referrerPolicy="no-referrer" className="profile-pic-public" style={{ borderColor: theme.accentColor }}/>}
           <div className="hero-text">
             <h1>{userName}</h1>
             <h2 style={{ color: theme.accentColor }}>{userSubtitle}</h2>
