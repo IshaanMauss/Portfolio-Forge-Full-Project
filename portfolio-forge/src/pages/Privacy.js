@@ -34,6 +34,7 @@ function Privacy() {
           <tr><td>Profile picture you upload</td><td>To show on your portfolio</td><td>Cloud Storage; public if you publish</td></tr>
           <tr><td>AI-assist text you submit (optional)</td><td>To suggest wording</td><td>Sent to Cloudflare Workers AI to generate the reply. We keep only a per-day usage counter.</td></tr>
           <tr><td>GitHub username you type into the import tool</td><td>To list your <em>public</em> repositories</td><td>Sent from your browser straight to GitHub&apos;s public API; we do not store it</td></tr>
+          <tr><td>Feedback you choose to send (rating, comment, your email)</td><td>To improve the product</td><td>Private collection in Cloud Firestore, readable only by the maintainer and by you. Deleted with your account.</td></tr>
           <tr><td>Theme choice and similar settings</td><td>To remember your preferences</td><td>Your browser&apos;s local storage only</td></tr>
         </tbody>
       </table>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { auth } from '../firebase/config';
 import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
 import { safeUrl, safeColor } from '../utils/escape';
 import { PORTFOLIO_FONTS, fontQuery } from '../utils/fonts';
 const Constellation3D = lazy(() => import('./Constellation3D'));
+const FeedbackToast = lazy(() => import('./FeedbackToast'));
 
 
 function PublicPortfolio() {
@@ -18,6 +20,24 @@ function PublicPortfolio() {
     setCurrentPageUrl(window.location.href);
   }, [userId, versionId]);
 
+  // After a signed-in owner returns from sharing on LinkedIn, offer a short feedback form (once).
+  useEffect(() => {
+    const showFeedbackToast = () => {
+      if (!auth.currentUser || toast.isActive('feedback-toast')) return;
+      toast(<Suspense fallback={null}><FeedbackToast userId={userId} currentUser={auth.currentUser} /></Suspense>, {
+        toastId: 'feedback-toast', className: 'modal-toast-container', position: 'top-center',
+        autoClose: false, closeOnClick: false, draggable: false,
+      });
+    };
+    const onFocus = () => {
+      let flagged = false;
+      try { flagged = !!sessionStorage.getItem('linkedin_share_initiated'); sessionStorage.removeItem('linkedin_share_initiated'); } catch (e) { /* storage blocked */ }
+      if (flagged) setTimeout(showFeedbackToast, 1000);
+    };
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [userId]);
+
   const formatUrl = safeUrl;
 
   const isFutureYear = (year) => {
@@ -29,7 +49,7 @@ function PublicPortfolio() {
   if (loading) return <div className="loading-screen">Loading...</div>;
   if (!portfolioData) return <div className="loading-screen">This portfolio does not exist or has not been published yet.</div>;
 
-  const { theme = {}, userName, userSubtitle, profilePicUrl, bio, location, links, projects = { items: [] }, hardSkills = { items: [] }, softSkills = { items: [] }, interests = { items: [] }, education = {}, certifications = { items: [] }, blogPosts = { showOnPage: false, items: [] }, customSections = { showOnPage: false, items: [] } } = portfolioData;
+  const { theme = {}, userName, userSubtitle, profilePicUrl, bio, location, links, portfolioLink, projects = { items: [] }, hardSkills = { items: [] }, softSkills = { items: [] }, interests = { items: [] }, education = {}, certifications = { items: [] }, blogPosts = { showOnPage: false, items: [] }, customSections = { showOnPage: false, items: [] } } = portfolioData;
   const layoutClass = theme.layout === 'compact' ? 'layout-compact' : 'layout-standard';
   const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentPageUrl)}`;
 
@@ -59,11 +79,14 @@ function PublicPortfolio() {
             <h1>{userName}</h1>
             <h2 style={{ color: theme.accentColor }}>{userSubtitle}</h2>
             {location?.showOnPage && <p className="location-public">{location.value}</p>}
+            {portfolioLink?.showOnPage !== false && portfolioLink?.value && safeUrl(portfolioLink.value) && (
+              <a href={safeUrl(portfolioLink.value)} target="_blank" rel="noopener noreferrer" className="portfolio-link-btn-public" style={{ backgroundColor: theme.accentColor, color: theme.backgroundColor }}>View My Works</a>
+            )}
           </div>
         </div>
         <div className="hero-actions">
           {currentUser && currentUser.uid === userId && (
-            <a href={linkedInShareUrl} target="_blank" rel="noopener noreferrer" className="linkedin-share-btn">
+            <a href={linkedInShareUrl} onClick={() => { try { sessionStorage.setItem('linkedin_share_initiated', 'true'); } catch (e) { /* ignore */ } }} target="_blank" rel="noopener noreferrer" className="linkedin-share-btn">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18px" height="18px"><path d="M20.5 2h-17A1.5 1.5 0 002 3.5v17A1.5 1.5 0 003.5 22h17a1.5 1.5 0 001.5-1.5v-17A1.5 1.5 0 0020.5 2zM8 19H5v-9h3zM6.5 8.25A1.75 1.75 0 118.25 6.5 1.75 1.75 0 016.5 8.25zM19 19h-3v-4.75c0-1.4-1.2-2.5-2.5-2.5S11 12.85 11 14.25V19h-3v-9h2.9v1.3a3.11 3.11 0 012.6-1.4c2.5 0 4.5 2.2 4.5 5.1V19z"></path></svg>
               Share on LinkedIn
             </a>

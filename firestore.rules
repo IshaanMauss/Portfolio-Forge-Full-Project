@@ -42,6 +42,28 @@ service cloud.firestore {
       }
     }
 
+    // Feedback from signed-in users. Strictly shaped and size-limited; only the maintainer
+    // (custom claim admin=true) can read everything. Each user can read and delete their own entries,
+    // so export/erasure on the Account page works.
+    match /feedback/{feedbackId} {
+      allow create: if request.auth != null
+                    && request.resource.data.keys().hasOnly(['portfolioContextId', 'submitterId', 'submitterEmail', 'rating', 'comment', 'timestamp'])
+                    && request.resource.data.submitterId == request.auth.uid
+                    && request.resource.data.rating is int
+                    && request.resource.data.rating >= 1 && request.resource.data.rating <= 5
+                    && request.resource.data.comment is string
+                    && request.resource.data.comment.size() > 0 && request.resource.data.comment.size() <= 1000
+                    && request.resource.data.portfolioContextId is string
+                    && request.resource.data.portfolioContextId.size() <= 128
+                    && request.resource.data.submitterEmail is string
+                    && request.resource.data.submitterEmail.size() <= 320
+                    && request.resource.data.timestamp == request.time;
+      allow read: if request.auth != null
+                  && (request.auth.token.admin == true || resource.data.submitterId == request.auth.uid);
+      allow delete: if request.auth != null && resource.data.submitterId == request.auth.uid;
+      allow update: if false;
+    }
+
     // AI usage counters are written by the Cloud Function (Admin SDK) only.
     match /aiUsage/{docId} {
       allow read, write: if false;

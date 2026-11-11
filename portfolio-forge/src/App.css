@@ -324,3 +324,9 @@
 .bullet-row { margin-bottom: 0.5rem; } .bullet-row details { font-size: 0.8rem; color: var(--muted); } .bullet-row summary { cursor: pointer; padding: 0.2rem 0; }
 .bullet-row ul { padding-left: 1.1rem; }
 @media (max-width: 480px) { .ready-list { grid-template-columns: 1fr; } }
+
+/* Edit button next to remove in item lists, and the optional portfolio link button */
+.list-item .edit-btn { background: var(--accent); color: var(--on-accent, #fff); border: none; border-radius: var(--radius-sm); padding: 0.25rem 0.7rem; font-weight: 600; font-size: 0.8rem; cursor: pointer; margin-left: auto; }
+.list-item .edit-btn + .remove-btn { margin-left: 0.4rem; }
+.portfolio-link-btn-public { display: inline-flex; align-items: center; padding: 0.7rem 1.3rem; border-radius: var(--radius-sm); text-decoration: none; font-weight: 600; font-size: 0.9rem; white-space: nowrap; transition: transform 0.2s ease; }
+.portfolio-link-btn-public:hover { transform: translateY(-2px); }

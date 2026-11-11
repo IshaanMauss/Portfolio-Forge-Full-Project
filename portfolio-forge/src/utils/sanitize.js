@@ -27,7 +27,8 @@ export function sanitizeForPublic(portfolio) {
 
   LIST_SECTIONS.forEach((key) => {
     if (!out[key]) return;
-    if (!out[key].showOnPage) out[key] = { showOnPage: false, items: [] };
+    // Kept when shown on the page OR on the resume (the resume reads the same published copy).
+    if (!out[key].showOnPage && !out[key].showOnResume) out[key] = { showOnPage: false, items: [] };
   });
 
   if (!out.location?.showOnPage) out.location = { value: '', showOnPage: false };

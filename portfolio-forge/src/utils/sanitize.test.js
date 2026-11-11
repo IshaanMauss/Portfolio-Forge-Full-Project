@@ -30,3 +30,10 @@ test('keeps visible data and does not mutate the input', () => {
   expect(out.education.college.name).toBe('C');
   expect(input.address.value).toBe('12 Secret St');
 });
+
+test('keeps a hidden-on-page section that is switched on for the resume', () => {
+  const data = { ...sample(), blogPosts: { showOnPage: false, showOnResume: true, items: [{ title: 'T', content: 'c' }] }, customSections: { showOnPage: false, items: [{ title: 'X' }] } };
+  const out = sanitizeForPublic(data);
+  expect(out.blogPosts.items).toHaveLength(1);
+  expect(out.customSections.items).toEqual([]);
+});

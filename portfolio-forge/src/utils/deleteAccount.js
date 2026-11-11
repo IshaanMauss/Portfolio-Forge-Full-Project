@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, getDocs, writeBatch } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, query, where, writeBatch } from 'firebase/firestore';
 import { ref, listAll, deleteObject } from 'firebase/storage';
 import { deleteUser, reauthenticateWithPopup } from 'firebase/auth';
 import { auth, db, storage, googleProvider } from '../firebase/config';
@@ -8,11 +8,13 @@ export async function exportMyData() {
   const user = auth.currentUser;
   const draft = await getDoc(doc(db, 'portfolios', user.uid));
   const tracker = await getDoc(doc(db, 'tracker', user.uid));
+  const fb = await getDocs(query(collection(db, 'feedback'), where('submitterId', '==', user.uid)));
   return {
     exportedAt: new Date().toISOString(),
     account: { uid: user.uid, name: user.displayName, email: user.email },
     portfolioDraft: draft.exists() ? draft.data() : null,
     jobTracker: tracker.exists() ? tracker.data() : null,
+    feedbackSubmitted: fb.docs.map((d) => ({ rating: d.data().rating, comment: d.data().comment })),
   };
 }
 
@@ -29,6 +31,8 @@ export async function deleteMyAccount() {
   batch.delete(doc(db, 'published', uid));
   batch.delete(doc(db, 'portfolios', uid));
   batch.delete(doc(db, 'tracker', uid));
+  const fb = await getDocs(query(collection(db, 'feedback'), where('submitterId', '==', uid)));
+  fb.forEach((d) => batch.delete(d.ref));
   await batch.commit();
 
   const files = await listAll(ref(storage, `profilePictures/${uid}`));

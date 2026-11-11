@@ -17,6 +17,7 @@ function PreviewPanel({ portfolioData, updatePortfolio }) {
     profilePicUrl,
     bio = '',
     location = {},
+    portfolioLink = {},
     education = {},
     hardSkills = { showOnPage: true, items: [] },
     softSkills = { showOnPage: true, items: [] },
@@ -77,6 +78,7 @@ function PreviewPanel({ portfolioData, updatePortfolio }) {
           ${picUrl ? `<img src="${e(picUrl)}" alt="Profile" class="profile-pic" referrerpolicy="no-referrer">` : ''}
           <h1>${e(userName)}</h1><h2 class="accent">${e(userSubtitle)}</h2>
           ${location?.showOnPage ? `<p>${e(location.value)}</p>` : ''}
+          ${portfolioLink?.showOnPage !== false && safeUrl(portfolioLink?.value) ? `<p><a href="${e(safeUrl(portfolioLink.value))}" target="_blank" rel="noopener noreferrer">View My Works</a></p>` : ''}
         </header>
         <section class="section"><h3>About Me</h3><p>${e(bio)}</p></section>
         ${hardSkills?.showOnPage && hardSkills?.items?.length > 0 ? `<section class="section"><h3>Hard Skills</h3><ul class="skills-list">${list(hardSkills.items)}</ul></section>` : ''}

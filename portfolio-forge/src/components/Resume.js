@@ -75,7 +75,7 @@ function Resume() {
         const scaleFactor = imgWidth / resumeElement.offsetWidth;
         const resumeRect = resumeElement.getBoundingClientRect();
 
-        ['email-link', 'linkedin-link', 'github-link'].forEach(id => {
+        ['email-link', 'linkedin-link', 'github-link', 'portfolio-link'].forEach(id => {
             const linkEl = document.getElementById(id);
             if (linkEl) {
                 const rect = linkEl.getBoundingClientRect();
@@ -107,7 +107,8 @@ function Resume() {
   if (!portfolioData) return <div className="loading-screen">Could not find resume data.</div>;
 
   const {
-    userName, userSubtitle, location, links, bio,
+    userName, userSubtitle, location, links, bio, portfolioLink,
+    blogPosts = { items: [] }, customSections = { items: [] },
     hardSkills = { items: [] }, softSkills = { items: [] },
     interests = { items: [] }, certifications = { items: [] },
     projects = { items: [] }, education, 
@@ -144,6 +145,7 @@ function Resume() {
             {links?.email && <> | <a id="email-link" href={`mailto:${links.email}`}>{links.email}</a></>}
             {links?.linkedin && <> | <a id="linkedin-link" href={formatUrl(links.linkedin)} target="_blank" rel="noopener noreferrer">LinkedIn</a></>}
             {links?.github && <> | <a id="github-link" href={formatUrl(links.github)} target="_blank" rel="noopener noreferrer">GitHub</a></>}
+            {portfolioLink?.showOnPage !== false && portfolioLink?.value && <> | <a id="portfolio-link" href={formatUrl(portfolioLink.value)} target="_blank" rel="noopener noreferrer">Portfolio</a></>}
           </div>
         </header>
         <main className="resume-main">
@@ -153,6 +155,8 @@ function Resume() {
             {certifications?.showOnPage && certifications.items.length > 0 && <section><h2>Certifications</h2>{certifications.items.map((c, i) => (<div key={i} className="certification-item-resume"><h3>{c.name}</h3><p>{c.issuer}</p></div>))}</section>}
           </div>
           <div className="sidebar-col-resume">
+            {blogPosts?.showOnResume && blogPosts.items?.length > 0 && <section><h2>Blog Posts</h2>{blogPosts.items.map((p, i) => (<div key={i} className="project-item-resume"><h3>{p.title}</h3><p>{p.content}</p></div>))}</section>}
+            {customSections?.showOnResume && customSections.items?.length > 0 && <section><h2>{customSections.title || 'Custom Section'}</h2>{customSections.items.map((item, i) => (<div key={i} className="project-item-resume"><h3>{item.title}</h3><p>{item.content}</p></div>))}</section>}
             {hardSkills?.showOnPage && hardSkills.items.length > 0 && <section><h2>Hard Skills</h2><ul className="skills-list-resume">{hardSkills.items.map(s => <li key={s}>{s}</li>)}</ul></section>}
             {softSkills?.showOnPage && softSkills.items.length > 0 && <section><h2>Soft Skills</h2><ul className="skills-list-resume">{softSkills.items.map(s => <li key={s}>{s}</li>)}</ul></section>}
             {interests?.showOnPage && interests.items.length > 0 && <section><h2>Interests</h2><ul className="skills-list-resume">{interests.items.map(i => <li key={i}>{i}</li>)}</ul></section>}
