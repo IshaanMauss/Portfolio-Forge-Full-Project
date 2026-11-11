@@ -10,7 +10,7 @@ binding = "AI"
 # Create with:  npx wrangler kv namespace create LIMITS   then paste the id below.
 [[kv_namespaces]]
 binding = "LIMITS"
-id = "REPLACE_WITH_KV_ID"
+id = "0c4a1709b9464438bbd0c492c4bad994"
 
 [vars]
 # Where the built React app is hosted (Firebase Hosting).
