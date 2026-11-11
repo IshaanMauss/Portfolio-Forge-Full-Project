@@ -17,6 +17,9 @@ ATS-friendly PDF resume.
 
 * **ATS resume checker** (`/tools/ats`): estimates parser-friendliness and job-description keyword match
 * **PDF editor** (`/tools/pdf`): merge, reorder, rotate, add text, sign. Files never leave your device
+* **Import**: from a resume PDF or from public GitHub repositories (with evidence for each generated bullet)
+* **3D constellation** of projects and skills on your public page (opt-in) with PNG export
+* **Job tracker**, private to you, with CSV export
 * Account page: export or permanently delete your data. Privacy and Terms pages included
 
 > Multiple portfolio versions are implemented but paused in the UI (`src/utils/features.js`).
