@@ -302,3 +302,25 @@
 .tools-strip-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; perspective: 900px; }
 .tool-link { display: flex; flex-direction: column; gap: 0.3rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; text-decoration: none; color: var(--text); }
 .tool-link strong { color: var(--link); } .tool-link span { color: var(--muted); font-size: 0.95rem; }
+
+/* ---------- Import panel ---------- */
+.import-tabs { display: flex; gap: 0.4rem; margin: 0.6rem 0; }
+.import-tabs button { flex: 1; min-height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--bg); color: var(--muted); font-weight: 600; cursor: pointer; }
+.import-tabs button.active { color: var(--on-primary); background: var(--primary); border-color: transparent; }
+.import-note { color: var(--muted); font-size: 0.85rem; margin-bottom: 0.5rem; }
+.import-review, .repo-list { display: flex; flex-direction: column; gap: 0.4rem; margin: 0.6rem 0; max-height: 320px; overflow-y: auto; }
+.import-row { display: flex; gap: 0.6rem; align-items: flex-start; padding: 0.5rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); cursor: pointer; margin: 0 !important; color: var(--text) !important; font-weight: 400 !important; font-size: 0.9rem !important; }
+.import-row input { margin-top: 0.25rem; width: 18px; height: 18px; flex-shrink: 0; }
+.import-row em { color: var(--muted); font-style: normal; font-size: 0.8rem; margin-left: 0.3rem; }
+.import-row small { color: var(--muted); }
+.gh-row { display: flex; gap: 0.5rem; } .gh-row input { flex: 1; min-width: 0; } .gh-row .add-btn { width: auto; margin-top: 0; }
+.repo-card { margin-top: 0.8rem; padding: 0.8rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); }
+.repo-card h4 { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; color: var(--text) !important; font-size: 1rem !important; }
+.pill { display: inline-block; padding: 0.1rem 0.6rem; border-radius: 999px; font-size: 0.78rem; font-weight: 600; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); }
+.pill.high { border-color: var(--primary); color: var(--primary); } .pill.medium { border-color: var(--cta); color: var(--cta); } .pill.low { border-color: var(--danger); color: var(--danger); }
+.chips-row { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.5rem 0; }
+.ready-list { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0.2rem 0.6rem; font-size: 0.82rem; margin-bottom: 0.4rem; }
+.ready-list .ok { color: var(--primary); } .ready-list .no { color: var(--muted); }
+.bullet-row { margin-bottom: 0.5rem; } .bullet-row details { font-size: 0.8rem; color: var(--muted); } .bullet-row summary { cursor: pointer; padding: 0.2rem 0; }
+.bullet-row ul { padding-left: 1.1rem; }
+@media (max-width: 480px) { .ready-list { grid-template-columns: 1fr; } }

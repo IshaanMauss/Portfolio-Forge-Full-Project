@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { getEnhancedText } from '../api/enhanceAPI';
 import { getEnhancedDescription } from '../api/suggestions';
 import ToggleSwitch from './ToggleSwitch';
+import ImportPanel from './ImportPanel';
 import { PORTFOLIO_PALETTES } from '../utils/palettes';
 
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
@@ -147,6 +148,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
 
   return (
     <aside className="controls-panel">
+      <ImportPanel portfolioData={portfolioData} updatePortfolio={updatePortfolio} />
       <details className="controls-section" open>
         <summary><h3>Profile & Contact</h3></summary>
         <label>Profile Picture</label>
