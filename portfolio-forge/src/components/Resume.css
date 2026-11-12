@@ -261,3 +261,17 @@
     padding: 5px 10px;
   }
 }
+/* PDF layout controls and live preview */
+.rlc { display: flex; flex-direction: column; gap: 0.75rem; }
+.rlc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; }
+.rlc label { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; }
+.rlc-title { margin: 0.25rem 0 0; }
+.rlc-order { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.35rem; }
+.rlc-order li { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.35rem 0.6rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); }
+.rlc-order li.off span:first-child { opacity: 0.45; text-decoration: line-through; }
+.rlc-btns { display: flex; gap: 0.3rem; }
+.rlc-btns button { min-width: 36px; min-height: 36px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); border-radius: var(--radius-sm); cursor: pointer; }
+.rlc-btns button:disabled { opacity: 0.35; cursor: default; }
+.rpv { display: flex; flex-direction: column; gap: 0.75rem; align-items: center; overflow-x: auto; }
+.rpv-page { max-width: 100%; height: auto !important; background: #fff; box-shadow: 0 6px 24px rgba(0,0,0,0.35); border-radius: 2px; }
+.resume-pdf-preview { max-width: 900px; margin: 1rem auto; padding: 0 1rem; display: flex; flex-direction: column; align-items: center; }

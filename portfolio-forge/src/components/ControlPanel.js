@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { PORTFOLIO_FONTS } from '../utils/fonts';
 import { auth, storage } from '../firebase/config';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -10,6 +10,9 @@ import ImportPanel from './ImportPanel';
 import FeedbackAdmin from './FeedbackAdmin';
 import { FEATURES } from '../utils/features';
 import { PORTFOLIO_PALETTES } from '../utils/palettes';
+
+const ResumeLayoutControls = lazy(() => import('./ResumeLayoutControls'));
+const ResumePdfPreview = lazy(() => import('./ResumePdfPreview'));
 
 const MAX_IMAGE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp'];
@@ -23,6 +26,7 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
   const [newBlogPost, setNewBlogPost] = useState({ title: '', content: '' });
   const [newCustomSection, setNewCustomSection] = useState({ title: '', content: '' });
   
+  const [showResumePreview, setShowResumePreview] = useState(false);
   const [editing, setEditing] = useState({ field: null, index: null });
   const [isUploading, setIsUploading] = useState(false);
   const [aiLoading, setAiLoading] = useState({});
@@ -338,6 +342,14 @@ function ControlPanel({ portfolioData, updatePortfolio }) {
         <div className="item-list">
           {(portfolioData.customSections?.items || []).map((section, index) => (<div key={index} className="list-item"><span>{section.title}</span><button type="button" className="edit-btn" onClick={() => handleEditItem('customSections', index)}>Edit</button><button onClick={() => handleRemoveItem('customSections', index)} className="remove-btn">X</button></div>))}
         </div>
+      </details>
+
+      <details className="controls-section">
+        <summary><h3>Resume PDF layout</h3></summary>
+        <p className="muted">Controls the PDF people download from your resume page. Saved with your portfolio; click Save &amp; Publish to apply.</p>
+        <Suspense fallback={null}><ResumeLayoutControls value={portfolioData.resume} onChange={(v) => updatePortfolio('resume', v)} /></Suspense>
+        <ToggleSwitch label="Live PDF preview" checked={showResumePreview} onChange={() => setShowResumePreview((v) => !v)} />
+        {showResumePreview && <Suspense fallback={<p className="muted">Building preview…</p>}><ResumePdfPreview data={portfolioData} settings={portfolioData.resume} width={340} /></Suspense>}
       </details>
 
       <details className="controls-section">

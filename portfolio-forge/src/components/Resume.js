@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { useParams } from 'react-router-dom';
 import { usePublishedPortfolio } from '../hooks/usePublishedPortfolio';
 import { safeUrl } from '../utils/escape';
@@ -7,10 +7,13 @@ import './Resume.css';
 import { toast } from 'react-toastify';
 import Seo from '../seo/Seo';
 
+const ResumePdfPreview = lazy(() => import('./ResumePdfPreview'));
+
 function Resume() {
   const { userId, versionId } = useParams();
   const { data: portfolioData, loading } = usePublishedPortfolio(userId, versionId);
   const [applyTheme, setApplyTheme] = useState(false);
+  const [showPdf, setShowPdf] = useState(false);
 
   const formatUrl = safeUrl;
 
@@ -20,90 +23,25 @@ function Resume() {
     return parseInt(year) > currentYear;
   };
 
-  // ... (existing imports and other code above exportToPdf function) ...
-
   const printResume = () => window.print();
 
-  // Quick image-based PDF (not selectable / not ATS friendly) - kept as a fallback.
-  const exportToPdf = async () => {
-    const resumeElement = document.getElementById('resume-content');
-    const { userName = 'User' } = portfolioData;
-
-    if (!resumeElement) {
-      toast.error("Could not find resume content to download.");
-      return;
+  const downloadPdf = async () => {
+    try {
+      const { buildResumePdf } = await import('../utils/resumePdf');
+      const { bytes } = await buildResumePdf(portfolioData, portfolioData.resume);
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = `${(portfolioData.userName || 'Resume').replace(/[^\w.-]+/g, '_')}_Resume.pdf`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      toast.success('PDF downloaded. It contains real, selectable text.');
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      toast.error('Could not generate the PDF. Please try again.');
     }
-    toast.info("Generating a high-quality PDF...");
-    const { default: html2canvas } = await import('html2canvas');
-    const jspdfModule = await import('jspdf');
-    const jsPDF = jspdfModule.jsPDF || jspdfModule.default;
-
-    const scrollY = window.scrollY;
-    window.scrollTo(0, 0);
-
-    html2canvas(resumeElement, {
-        scale: 2.5, // **CHANGED: A balanced scale for great quality and smaller size**
-        useCORS: true,
-        logging: false,
-        dpi: 192, // **CHANGED: Reduced DPI, still great for screens**
-        letterRendering: true,
-    }).then(canvas => {
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-        const ratio = canvasHeight / canvasWidth;
-        
-        let imgWidth = pdfWidth;
-        let imgHeight = pdfWidth * ratio;
-        let x_offset = 0;
-        let y_offset = 0;
-
-        if (imgHeight > pdfHeight) {
-            imgHeight = pdfHeight;
-            imgWidth = imgHeight / ratio;
-            x_offset = (pdfWidth - imgWidth) / 2;
-        }
-
-        // **THE KEY CHANGE: Convert canvas to JPEG format with medium quality**
-        const imageData = canvas.toDataURL('image/jpeg', 0.9); // 0.9 is 90% quality
-
-        pdf.addImage(imageData, 'JPEG', x_offset, y_offset, imgWidth, imgHeight, null, 'MEDIUM');
-
-        // --- ADD CLICKABLE LINKS (This logic remains the same) ---
-        const scaleFactor = imgWidth / resumeElement.offsetWidth;
-        const resumeRect = resumeElement.getBoundingClientRect();
-
-        ['email-link', 'linkedin-link', 'github-link', 'portfolio-link'].forEach(id => {
-            const linkEl = document.getElementById(id);
-            if (linkEl) {
-                const rect = linkEl.getBoundingClientRect();
-                const relativeX = rect.left - resumeRect.left;
-                const relativeY = rect.top - resumeRect.top;
-
-                const x = x_offset + (relativeX * scaleFactor);
-                const y = y_offset + (relativeY * scaleFactor);
-                const w = rect.width * scaleFactor;
-                const h = rect.height * scaleFactor;
-                
-                pdf.link(x, y, w, h, { url: linkEl.href });
-            }
-        });
-
-        pdf.save(`${userName.replace(/\s+/g, '_')}_Resume.pdf`);
-        toast.success("PDF Downloaded!");
-
-    }).catch(err => {
-        console.error("PDF Generation Error:", err);
-        toast.error("Could not generate PDF. Check console for details.");
-    }).finally(() => {
-        window.scrollTo(0, scrollY);
-    });
   };
 
-// ... (rest of the component code below exportToPdf function) ...
   if (loading) return <div className="loading-screen">Loading Resume...</div>;
   if (!portfolioData) return <div className="loading-screen">Could not find resume data.</div>;
 
@@ -133,10 +71,16 @@ function Resume() {
         <div className="theme-toggle-wrapper">
           <ToggleSwitch label="Apply Portfolio Theme" checked={applyTheme} onChange={() => setApplyTheme(!applyTheme)} />
         </div>
-        <button onClick={printResume} title="Opens the print dialog - choose 'Save as PDF'. Text stays selectable and ATS-readable.">Download PDF (text, ATS-friendly)</button>
-        <button onClick={exportToPdf} title="Quick image-based PDF">Quick image PDF</button>
+        <button onClick={downloadPdf} title="Real-text PDF, readable by applicant tracking systems">Download PDF</button>
+        <button onClick={() => setShowPdf((v) => !v)} aria-pressed={showPdf}>{showPdf ? 'Show web view' : 'Preview PDF'}</button>
+        <button onClick={printResume} title="Opens the print dialog (web layout)">Print</button>
       </div>
-      <div id="resume-content" className={`resume-container ${applyTheme ? 'theme-applied' : ''}`} style={applyTheme ? dynamicStyles : {}}>
+      {showPdf && (
+        <div className="resume-pdf-preview">
+          <Suspense fallback={<p className="muted">Building preview…</p>}><ResumePdfPreview data={portfolioData} settings={portfolioData.resume} width={640} /></Suspense>
+        </div>
+      )}
+      <div id="resume-content" className={`resume-container ${applyTheme ? 'theme-applied' : ''}`} style={showPdf ? { display: 'none' } : (applyTheme ? dynamicStyles : {})}>
         <header className="resume-header">
           {imageToDisplay && <img id="resume-profile-pic" src={imageToDisplay} alt="Profile" referrerPolicy="no-referrer" crossOrigin="anonymous" className="profile-pic-resume" />}
           <h1>{userName}</h1>
