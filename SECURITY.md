@@ -35,7 +35,7 @@ Cloudflare, Google).
 `base-uri 'self'`, `frame-ancestors 'none'` and `form-action 'self'`. The full script/style/connect
 policy is sent as `Content-Security-Policy-Report-Only` first, so it can be checked in the browser
 console without breaking sign-in. After a clean pass, move its directives into the enforced header
-(for CRA builds also set `INLINE_RUNTIME_CHUNK=false` so no inline script is needed).
+(the Vite build emits only external module scripts, so no inline script is needed).
 
 ## Data minimisation
 

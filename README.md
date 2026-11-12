@@ -48,8 +48,10 @@ git clone https://github.com/IshaanMauss/Portfolio-Forge-Full-Project.git
 cd Portfolio-Forge-Full-Project/portfolio-forge
 cp .env.example .env.local      # fill in your Firebase web app config
 npm install
-npm start                        # http://localhost:3000
+npm run dev                      # http://localhost:3000 (Vite)
 ```
+
+Other commands: `npm test` (Vitest), `npm run build` (Vite build, then static SEO pages, sitemap and robots.txt in `build/`). Security-rules tests: `cd rules-tests && npm install && npm test` (needs Java 21).
 
 AI backend (optional locally): set the secrets and run `firebase emulators:start` from the repo root.
 

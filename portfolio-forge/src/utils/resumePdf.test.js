@@ -1,4 +1,4 @@
-/** @jest-environment node */
+// @vitest-environment node
 import { buildResumePdf, normalizeResumeSettings, collectSections, SECTION_IDS } from './resumePdf';
 import { scoreResume } from './ats';
 import { parseResume } from './resumeImport';
